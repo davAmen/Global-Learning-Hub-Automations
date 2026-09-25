@@ -1,8 +1,4 @@
-"""WhatsApp channel - Phase 1 ACTIVE.
-
-Uses the WhatsApp Business Cloud API (Meta).
-All credentials come from the environment - never hardcoded.
-"""
+"""WhatsApp Business Cloud API channel."""
 
 from __future__ import annotations
 
@@ -23,8 +19,14 @@ class WhatsAppChannel(Channel):
         if not (settings.whatsapp_token and settings.whatsapp_phone_id):
             logger.error("WhatsApp not configured.")
             return False
+        if student is None or not getattr(student, "phone", None):
+            logger.error("WhatsApp recipient has no phone number.")
+            return False
 
-        url = f"https://graph.facebook.com/v20.0/{settings.whatsapp_phone_id}/messages"
+        url = (
+            f"https://graph.facebook.com/{settings.whatsapp_graph_version}/"
+            f"{settings.whatsapp_phone_id}/messages"
+        )
         headers = {
             "Authorization": f"Bearer {settings.whatsapp_token}",
             "Content-Type": "application/json",
@@ -36,10 +38,10 @@ class WhatsAppChannel(Channel):
             "text": {"preview_url": False, "body": message},
         }
         try:
-            r = httpx.post(url, headers=headers, json=payload, timeout=15)
-            r.raise_for_status()
-            logger.info(f"WhatsApp sent to {student.phone}")
+            response = httpx.post(url, headers=headers, json=payload, timeout=15.0)
+            response.raise_for_status()
+            logger.info("WhatsApp request accepted for %s", student.phone)
             return True
         except httpx.HTTPError as exc:
-            logger.error(f"WhatsApp send failed for {student.phone}: {exc}")
+            logger.error("WhatsApp send failed for %s: %s", student.phone, exc)
             return False
