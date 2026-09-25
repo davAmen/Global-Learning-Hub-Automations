@@ -115,6 +115,20 @@ def send_reminders(db, on_date: date | None = None) -> int:
         class_time = str(resp.data[0]["class_time"]) if resp.data and resp.data[0]["class_time"] else "TBD"
         tmpl = reminder_for(student.name, course_name, class_time, status)
 
+        # Claim the day's unique slot BEFORE contacting the provider. A second
+        # worker cannot pass this insert, even when both passed already_sent().
+        try:
+            claim = db.table("reminder_log").insert({
+                "enrollment_id": str(enrollment.id),
+                "channel": channel.name,
+                "message": tmpl.body,
+                "delivery_status": "pending",
+            }).execute()
+            claim_id = claim.data[0]["id"]
+        except Exception:
+            logger.warning("Reminder claim unavailable for enrollment %s", enrollment.id)
+            continue
+
         ok = False
         try:
             ok = channel.send(student, tmpl.body)
@@ -122,12 +136,9 @@ def send_reminders(db, on_date: date | None = None) -> int:
             logger.exception("Channel raised while sending enrollment %s", enrollment.id)
 
         try:
-            db.table("reminder_log").insert({
-                "enrollment_id": str(enrollment.id),
-                "channel": channel.name,
-                "message": tmpl.body,
+            db.table("reminder_log").update({
                 "delivery_status": "sent" if ok else "failed",
-            }).execute()
+            }).eq("id", claim_id).execute()
         except Exception:
             logger.exception("Could not persist reminder log for enrollment %s", enrollment.id)
             # Never count an unlogged delivery as a successful automated run.
