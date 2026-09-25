@@ -41,3 +41,7 @@ When a new decision is made during this project, add it to this file in the same
 ### ARCHITECTURE.md is the living spec
 **Decided (2026-09-18):** ARCHITECTURE.md and DECISIONS.md are the live source of truth. They must be updated BEFORE code changes are made when a decision changes. The operator explicitly requested this.
 **Why:** Prevents silent drift between what's decided and what's built.
+
+### Platform expansion requested (2026-09-25)
+**Decided:** The operator requests a public learning platform with a website, learner portal, affordable courses, admission workflow, feedback review, AI-supported course drafting, and a human tutor option. The original Phase 1 reminder service remains a component. The earlier Phase 1 scope boundary is superseded for planning and incremental implementation by this explicit request.
+**Safeguards:** A displayed price or mock checkout is not a payment. Admission letters and seats are issued only after verified server-side payment confirmation. AI course drafts and service changes require human approval before publication. Hiring depends on an approved budget and human decision. No real student data or live sends are authorized by this request.

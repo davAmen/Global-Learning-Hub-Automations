@@ -23,16 +23,18 @@ scheduler = BackgroundScheduler()
 def run_scheduled_job():
     from src.database import get_db
     from src.automation.scheduler import send_reminders
+    from src.reports.daily_report import build_report, send_report_to_admin
 
     logger.info("Scheduled job firing.")
     db = get_db()
     send_reminders(db)
+    send_report_to_admin(build_report(db))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    scheduler.add_job(run_scheduled_job, "cron", hour=settings.job_hour, minute=settings.job_minute)
+    scheduler.add_job(run_scheduled_job, "cron", hour=settings.job_hour, minute=settings.job_minute, id="daily", max_instances=1, coalesce=True)
     scheduler.start()
     logger.info(f"Scheduler started. Job fires daily at {settings.job_hour:02d}:{settings.job_minute:02d}.")
     yield

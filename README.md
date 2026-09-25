@@ -7,14 +7,17 @@ to the administrator.
 **Read first:** `docs/AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`.
 Those three files are the source of truth for this repository.
 
+The requested learning platform expansion is specified in `docs/PLATFORM_BRIEF.md`.
+The current code is the reminder service, not a deployed course marketplace.
+
 ## What it does
 
 1. Every day a scheduled job figures out which students need a reminder.
 2. It sends that reminder through exactly **one** delivery channel
-   (currently `email`).
+   (currently `whatsapp`).
 3. It logs every send to `reminder_log` and to a log file.
 4. It marks students as `active` / `low_engagement` / `needs_followup`.
-5. It builds and sends a daily engagement report to the administrator.
+5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled runs.
 
 ## Stack
 
@@ -35,9 +38,12 @@ python scripts\run_daily_job.py      # runs today's job manually, logs results
 uvicorn src.main:app --reload        # start the API
 ```
 
-> **No real student data or live sends happen until the operator explicitly
-> authorizes the Week 3 controlled pilot.** Everything uses fake data until
-> then. If you're unsure, ask.
+> **Use synthetic student data and test credentials only until a controlled pilot is explicitly authorized.** A configured provider credential can send live messages, so leave provider tokens unset during local tests.
+
+Set a long random `ADMIN_API_KEY` in `.env` and send it in the `X-Admin-Key`
+header for `/run-daily-job` and `/reports/today`. Never expose that key in a
+public web page. The delivery webhook currently responds 501 until signed
+provider payload verification and provider-message-ID mapping are built.
 
 ## API
 

@@ -71,24 +71,14 @@ def send_report_to_admin(report: dict, channel_name: str | None = None) -> bool:
     lines = [
         f"Daily Report - {report['date']}",
         f"Courses today: {report['courses_today']}",
-        f"Total enrolled: {report['total_total'] if 'total_total' in report else report['total_enrolled']}",
+        f"Total enrolled: {report['total_enrolled']}",
         f"Engagement: {report['engagement']}",
         f"Reminders sent: {report['reminders']}",
     ]
     body = "\n".join(lines)
 
-    if settings.admin_email:
-        from src.channels.email_channel import EmailChannel
-        ch = EmailChannel()
-        from src.database.models import Student
-        admin = Student(
-            id="00000000-0000-0000-0000-000000000000",
-            name="Administrator",
-            phone=settings.admin_phone,
-            email=settings.admin_email,
-            created_at=date.today().isoformat(),
-        )
-        return ch.send(admin, body)
-
-    logger.warning("No admin email configured - report not sent.")
-    return False
+    if channel_name != "telegram":
+        logger.error("Administrator report requires the configured Telegram channel")
+        return False
+    from src.channels.telegram_channel import TelegramChannel
+    return TelegramChannel().send(None, body)

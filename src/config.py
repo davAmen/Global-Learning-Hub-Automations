@@ -15,9 +15,10 @@ class Settings(BaseSettings):
 
     supabase_url: str = ""
     supabase_key: str = ""
+    admin_api_key: str = ""
 
-    active_channel: Literal["whatsapp", "telegram", "email", "sms"] = "whatsapp"
-    backup_channel: Literal["whatsapp", "telegram", "email", "sms"] = "telegram"
+    active_channel: Literal["whatsapp", "telegram"] = "whatsapp"
+    backup_channel: Literal["whatsapp", "telegram"] = "telegram"
 
     whatsapp_token: str = ""
     whatsapp_phone_id: str = ""

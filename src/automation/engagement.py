@@ -47,7 +47,6 @@ def update_engagement(db, enrollment_id, reference: date | None = None) -> str:
             "enrollment_id": str(enrollment_id),
             "date": reference.isoformat(),
             "status": status,
-            "assignment_submitted": status == "active",
         },
         on_conflict="enrollment_id,date",
     ).execute()
