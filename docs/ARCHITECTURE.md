@@ -1,4 +1,5 @@
 # ARCHITECTURE.md
+> The Phase 1 implementation below remains current. See `PLATFORM_BRIEF.md` for the newly requested platform expansion and phased delivery. New platform tables, provider integration, and public endpoints require documented designs before code is deployed.
 ### Student Engagement & Reminder Automation -- Global Learning Hub, Phase 1
 
 This is the technical specification for this repository. Any code written must conform to this structure. If a change requires deviating from it, that deviation must be discussed and this document updated first -- do not silently drift from it.
