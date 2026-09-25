@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
+from src.automation.scheduler import _utc_day_bounds
 
 from src.config import get_settings
 from src.database import get_db
@@ -12,8 +14,8 @@ logger = get_logger(__name__)
 
 
 def build_report(db, on_date: date | None = None) -> dict:
-    on_date = on_date or date.today()
     settings = get_settings()
+    on_date = on_date or datetime.now(ZoneInfo(settings.timezone)).date()
 
     courses_resp = db.table("courses").select("id, name").eq("start_date", on_date.isoformat()).execute()
     courses = courses_resp.data or []
@@ -48,7 +50,8 @@ def build_report(db, on_date: date | None = None) -> dict:
                 else:
                     total_followup += 1
 
-    reminders = db.table("reminder_log").select("delivery_status").gte("sent_at", f"{on_date.isoformat()}T00:00:00").lt("sent_at", f"{on_date.isoformat()}T23:59:59").execute()
+    start, end = _utc_day_bounds(on_date)
+    reminders = db.table("reminder_log").select("delivery_status").gte("sent_at", start).lt("sent_at", end).execute()
     for r in (reminders.data or []):
         if r["delivery_status"] == "sent":
             total_sent += 1
