@@ -1,11 +1,8 @@
-"""FastAPI app entry point.
-
-Sets up routes and APScheduler for the daily job.
-"""
+"""FastAPI application entry point."""
 
 from contextlib import asynccontextmanager
+from zoneinfo import ZoneInfo
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
 
 from src.api.routes_health import router as health_router
@@ -16,11 +13,10 @@ from src.config import get_settings
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+scheduler = None
 
-scheduler = BackgroundScheduler()
 
-
-def run_scheduled_job():
+def run_scheduled_job() -> None:
     from src.database import get_db
     from src.automation.scheduler import send_reminders
     from src.reports.daily_report import build_report, send_report_to_admin
@@ -33,13 +29,39 @@ def run_scheduled_job():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global scheduler
     settings = get_settings()
-    scheduler.add_job(run_scheduled_job, "cron", hour=settings.job_hour, minute=settings.job_minute, id="daily", max_instances=1, coalesce=True)
-    scheduler.start()
-    logger.info(f"Scheduler started. Job fires daily at {settings.job_hour:02d}:{settings.job_minute:02d}.")
+
+    if settings.enable_scheduler:
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        scheduler = BackgroundScheduler(timezone=ZoneInfo(settings.timezone))
+        scheduler.add_job(
+            run_scheduled_job,
+            "cron",
+            hour=settings.job_hour,
+            minute=settings.job_minute,
+            id="daily",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        scheduler.start()
+        logger.info(
+            "Scheduler started for %02d:%02d %s.",
+            settings.job_hour,
+            settings.job_minute,
+            settings.timezone,
+        )
+    else:
+        logger.info("In-process scheduler disabled; use POST /run-daily-job or an external cron.")
+
     yield
-    scheduler.shutdown()
-    logger.info("Scheduler shut down.")
+
+    if scheduler is not None and scheduler.running:
+        scheduler.shutdown(wait=False)
+        scheduler = None
+        logger.info("Scheduler shut down.")
 
 
 app = FastAPI(title="Global Learning Hub Automation", lifespan=lifespan)
