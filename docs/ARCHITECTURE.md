@@ -1,5 +1,5 @@
 # ARCHITECTURE.md
-> The Phase 1 implementation below remains current. See `PLATFORM_BRIEF.md` for the newly requested platform expansion and phased delivery. New platform tables, provider integration, and public endpoints require documented designs before code is deployed.
+> The Phase 1 implementation below remains current. `PLATFORM_BRIEF.md` records the approved product expansion, and `MASTER_PROMPT.md` sequences it with the operator's additional attendance, classroom-agent, marketing, and partnership goals. This roadmap does not itself activate later-phase implementation. New tables, providers, frontend locations, and public endpoints require documented designs before code is changed; deployment and live external actions require separate approval.
 ### Student Engagement & Reminder Automation -- Global Learning Hub, Phase 1
 
 This is the technical specification for this repository. Any code written must conform to this structure. If a change requires deviating from it, that deviation must be discussed and this document updated first -- do not silently drift from it.
