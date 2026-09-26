@@ -53,3 +53,18 @@ def test_send_and_log_does_not_send_when_attempt_cannot_be_logged():
     assert send_and_log(db, channel, student, "Sample reminder", "enrollment-1") is False
 
     channel.send.assert_not_called()
+
+
+@pytest.mark.parametrize("phone", [None, "", "   "])
+def test_whatsapp_without_phone_does_not_call_provider(phone):
+    from src.channels.whatsapp_channel import WhatsAppChannel
+
+    student = SimpleNamespace(name="Sample Student", phone=phone)
+    settings = SimpleNamespace(whatsapp_token="test-token", whatsapp_phone_id="test-phone-id")
+
+    with patch("src.channels.whatsapp_channel.get_settings", return_value=settings), patch(
+        "src.channels.whatsapp_channel.httpx.post"
+    ) as post:
+        assert WhatsAppChannel().send(student, "Hello") is False
+
+    post.assert_not_called()
