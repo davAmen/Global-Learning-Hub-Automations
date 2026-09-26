@@ -1,5 +1,5 @@
 # ARCHITECTURE.md
-> The Phase 1 implementation below remains current. `PLATFORM_BRIEF.md` records the approved product expansion, and `MASTER_PROMPT.md` sequences it with the operator's additional attendance, classroom-agent, marketing, and partnership goals. This roadmap does not itself activate later-phase implementation. New tables, providers, frontend locations, and public endpoints require documented designs before code is changed; deployment and live external actions require separate approval.
+> The Phase 1 implementation below remains current. `PLATFORM_BRIEF.md` records the approved product expansion, and `MASTER_PROMPT.md` sequences it with the operator's additional attendance, classroom-agent, marketing, and partnership goals. This roadmap does not itself activate later-phase implementation. New tables, providers, frontend locations, and public endpoints require documented designs before code is changed; deployment, live database migrations, and other external actions require separate approval.
 ### Student Engagement & Reminder Automation -- Global Learning Hub, Phase 1
 
 This is the technical specification for this repository. Any code written must conform to this structure. If a change requires deviating from it, that deviation must be discussed and this document updated first -- do not silently drift from it.
@@ -112,6 +112,8 @@ global-learning-hub-frontend/
 
 ## Database Schema
 
+`reminder_log.enrollment_id` is nullable for administrator-level report delivery attempts that are not associated with one student enrollment. Updating this SQL file does not migrate an existing Supabase database; that requires separate explicit authorization.
+
 ```sql
 -- students
 create table if not exists students (
@@ -153,7 +155,7 @@ create table if not exists engagement_log (
 -- reminder_log
 create table if not exists reminder_log (
   id              uuid primary key default gen_random_uuid(),
-  enrollment_id   uuid not null references enrollments(id),
+  enrollment_id   uuid references enrollments(id),
   channel         text not null,
   message         text,
   sent_at         timestamptz not null default now(),

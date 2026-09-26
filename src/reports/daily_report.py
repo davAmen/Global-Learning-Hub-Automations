@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
+from typing import Any
 
 from src.config import get_settings
 from src.database import get_db
+from src.channels.base import get_channel, send_and_log
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -13,7 +15,7 @@ logger = get_logger(__name__)
 
 def build_report(db, on_date: date | None = None) -> dict:
     on_date = on_date or date.today()
-    settings = get_settings()
+    next_day = on_date + timedelta(days=1)
 
     courses_resp = db.table("courses").select("id, name").eq("start_date", on_date.isoformat()).execute()
     courses = courses_resp.data or []
@@ -48,8 +50,16 @@ def build_report(db, on_date: date | None = None) -> dict:
                 else:
                     total_followup += 1
 
-    reminders = db.table("reminder_log").select("delivery_status").gte("sent_at", f"{on_date.isoformat()}T00:00:00").lt("sent_at", f"{on_date.isoformat()}T23:59:59").execute()
+    reminders = (
+        db.table("reminder_log")
+        .select("delivery_status, enrollment_id")
+        .gte("sent_at", f"{on_date.isoformat()}T00:00:00")
+        .lt("sent_at", f"{next_day.isoformat()}T00:00:00")
+        .execute()
+    )
     for r in (reminders.data or []):
+        if not r.get("enrollment_id"):
+            continue
         if r["delivery_status"] == "sent":
             total_sent += 1
         elif r["delivery_status"] == "failed":
@@ -64,21 +74,48 @@ def build_report(db, on_date: date | None = None) -> dict:
     }
 
 
-def send_report_to_admin(report: dict, channel_name: str | None = None) -> bool:
+def send_report_to_admin(
+    report: dict,
+    db: Any | None = None,
+    channel_name: str | None = None,
+) -> bool:
     settings = get_settings()
     channel_name = channel_name or settings.backup_channel
+    if channel_name != "telegram":
+        logger.error("Administrator report requires the configured Telegram channel")
+        return False
+
+    if db is None:
+        db = get_db()
+
+    report_date = date.fromisoformat(report["date"])
+    next_day = report_date + timedelta(days=1)
+    previous_attempt = (
+        db.table("reminder_log")
+        .select("id")
+        .is_("enrollment_id", "null")
+        .gte("sent_at", f"{report_date.isoformat()}T00:00:00")
+        .lt("sent_at", f"{next_day.isoformat()}T00:00:00")
+        .execute()
+    )
+    if previous_attempt.data:
+        logger.info(f"Daily report for {report_date.isoformat()} was already attempted.")
+        return False
 
     lines = [
         f"Daily Report - {report['date']}",
         f"Courses today: {report['courses_today']}",
         f"Total enrolled: {report['total_enrolled']}",
-        f"Engagement: {report['engagement']}",
-        f"Reminders sent: {report['reminders']}",
+        (
+            "Engagement: "
+            f"{report['engagement']['active']} active, "
+            f"{report['engagement']['low_engagement']} low engagement, "
+            f"{report['engagement']['needs_followup']} need follow-up"
+        ),
+        f"Reminders sent: {report['reminders']['sent']}",
+        f"Reminders failed: {report['reminders']['failed']}",
     ]
     body = "\n".join(lines)
 
-    if channel_name != "telegram":
-        logger.error("Administrator report requires the configured Telegram channel")
-        return False
-    from src.channels.telegram_channel import TelegramChannel
-    return TelegramChannel().send(None, body)
+    channel = get_channel(channel_name)
+    return send_and_log(db, channel, None, body, None)

@@ -48,7 +48,7 @@ def send_and_log(
     channel: Channel,
     student: Any,
     message: str,
-    enrollment_id: UUID | str,
+    enrollment_id: UUID | str | None,
 ) -> bool:
     """Log a pending student-message attempt before contacting its channel."""
     attempt_id = str(uuid4())
@@ -58,7 +58,7 @@ def send_and_log(
         db.table("reminder_log").insert(
             {
                 "id": attempt_id,
-                "enrollment_id": str(enrollment_id),
+                "enrollment_id": str(enrollment_id) if enrollment_id is not None else None,
                 "channel": channel.name,
                 "message": message,
                 "sent_at": datetime.now(timezone.utc).isoformat(),

@@ -38,7 +38,7 @@ create table if not exists engagement_log (
 -- reminder_log
 create table if not exists reminder_log (
   id              uuid primary key default gen_random_uuid(),
-  enrollment_id   uuid not null references enrollments(id),
+  enrollment_id   uuid references enrollments(id),
   channel         text not null,
   message         text,
   sent_at         timestamptz not null default now(),
