@@ -69,6 +69,12 @@
 
 ## 2026-09-27, Device-readiness reminders and school-device fallback
 
-**What was decided:** Periodically remind students to charge their own devices before class; use a school-provided device where available. Reminder cadence, wording, and delivery channel are not yet selected, and no live message is authorized.
+**What was decided:** Remind students to charge their own devices before class; use a school-provided device where available. At first, the cadence was left open; the operator later selected a weekly reminder (see below). Wording, day/time, and delivery channel remain open, and no live message is authorized.
 **Why:** A charged personal device supports class participation, while school equipment can help when available.
 **What was rejected:** Assuming every learner will always have a charged, working personal device, or treating this policy as permission for unsolicited or immediate messaging. Any future notice must follow the chosen channel's consent and opt-out rules.
+
+## 2026-09-27, Weekly cadence selected for device-readiness reminders
+
+**What was decided:** Send one device-readiness reminder weekly, asking learners to charge their devices for class and use a school-provided device where available.
+**Why:** The operator prefers a less frequent reminder rather than a message before every class.
+**What was rejected:** A reminder before every class. The exact day/time, wording, and channel remain undecided; this decision does not authorize sending messages or adding a channel.
