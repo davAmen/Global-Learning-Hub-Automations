@@ -101,4 +101,10 @@
 
 **What was decided:** Each student chooses and ranks any opted-in fallback channels behind their preferred channel; attempts follow that order. No simultaneous cross-channel broadcast. Channel ranking does not replace separate consent for each channel.
 **Why:** The operator wants students—not a system default—to decide the order in which their selected channels are tried.
-**What was rejected:** A fixed system-wide fallback order. Failure definitions and handling of uncertain delivery remain to be designed to prevent duplicates; this decision does not authorize provider setup or live sends.
+**What was rejected:** A fixed system-wide fallback order. At the time, handling of uncertain delivery remained open; the operator later approved requiring confirmed failure before fallback (see below). This decision does not authorize provider setup or live sends.
+
+## 2026-09-27, Confirmed failure required before channel fallback
+
+**What was decided:** Try a student's next ranked, opted-in channel only after the current provider confirms a terminal delivery failure. Pending or unknown status is not failure and must not trigger fallback until the result is reconciled.
+**Why:** Falling back while the first provider may still deliver could cause the student to receive duplicate reminders.
+**What was rejected:** Treating a timeout, pending status, or ambiguous provider response as proof of failure. Provider-specific failure mapping, retry limits, and reconciliation timing remain to be designed; no provider integration or live send is authorized.
