@@ -48,3 +48,9 @@
 **What was decided:** Record one learning site and one class as a provisional planning assumption, not as confirmed pilot scope or authorization to use real learner data. Recommend explicit learner check-in, separate assignment evidence, teacher-audited corrections, visible offline/sync status, duplicate-safe acknowledged retries, and human review of conflicting edits.
 **Why:** A small synthetic-data exercise can test the core local-classroom and reconnect flow without pretending that unresolved security, account, conflict, or recovery decisions are settled.
 **What was rejected:** Treating the planning assumption as a launched pilot; using passive signals as attendance; silently overwriting local records; or automatically disciplining/withdrawing learners.
+
+## 2026-09-27, Research-informed hybrid sync recommendation (pending approval)
+
+**What was decided:** Recommend the site hub as authority for locally created class records and the cloud as authority for remote-origin records. If the site's internet is down, onsite class continues locally and remote users can use the cloud separately, but the platform must not claim they are in the same live room. Proposed sync uses a durable outbox, stable event IDs, acknowledgements, idempotent retry, and human review of conflicts.
+**Why:** Official offline-learning references show local serving and syncing are feasible, while Moodle's documented limitations and CouchDB's documented conflict handling show offline activity timestamps and merge behavior need explicit application rules.
+**What was rejected:** Assuming Supabase replication alone solves offline application sync, silently applying “winning” edits to attendance, or requiring disconnected sites to reach the cloud for each write.
