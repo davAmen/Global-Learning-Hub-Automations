@@ -10,6 +10,7 @@ When a new decision is made during this project, add it to this file in the same
 ### Data storage: Supabase only, not Google Sheets
 **Decided:** Supabase (Postgres) is the single source of truth for all student, course, enrollment, and log data.
 **Why:** An earlier draft of this project considered syncing data to Google Sheets alongside a database. This was rejected -- two sources of truth create sync bugs and confusion about which is authoritative. If a human-editable view is needed, Supabase's own table editor serves that purpose without a second data store.
+**Scope status (2026-09-27):** This remains the Phase 1 reminder service's data-store decision. It does not yet define how a future hybrid classroom platform can accept local writes during internet outages; do not silently add a local database or assume Supabase alone satisfies offline operation. The local/cloud authority and sync model must be decided before schema changes for that platform.
 
 ### Backend framework: FastAPI, not plain scripts
 **Decided:** The backend is a FastAPI application, not a standalone script triggered only by cron.
@@ -57,8 +58,15 @@ When a new decision is made during this project, add it to this file in the same
 **Safeguard:** Update the schema specification only. Do not migrate or otherwise change a live database without separate explicit authorization. If the deployed schema still requires `enrollment_id`, fail closed and do not send an unlogged report.
 **What was rejected:** Leaving administrator sends unlogged, assigning them to a fake student enrollment, or introducing another audit table.
 
-### Phase 2 attendance source and login gate (2026-09-27)
-**Decided:** No class-platform integration is selected for the initial attendance design. Use a visible, learner-initiated check-in only after verified learner login exists, with teacher corrections that are auditable. The operator selected this approach when activating Phase 2.
+### Phase 2 attendance source and login gate (2026-09-27) — superseded in part
+**Originally decided:** No class-platform integration was selected; use a visible, learner-initiated check-in only after verified learner login exists, with auditable teacher corrections.
+**Status:** The no-platform choice was superseded by the operator's request for an owned local-and-remote class platform. Verified identity, notice/consent, and auditable teacher corrections remain required.
 **Why:** The selected repository has no class-platform integration, learner authentication, or attendance model. Accepting a student ID alone could allow someone to record attendance for another learner.
 **What was rejected:** Covert sensing, attendance inferred from online/read status, and public check-ins that trust an unverified student ID.
-**Still to define before schema/API changes:** Session/timezone rules, late/partial/excused attendance, source and correction audit details, learner notice/consent, and retention. Four consecutive absences may result in supportive contact and human review only, never automatic course withdrawal.
+**Still to define before schema/API changes:** Session/timezone rules, late/partial/excused attendance, source and correction audit details, learner notice/consent, retention, and local/cloud data ownership and sync. Four consecutive absences may result in supportive contact and human review only, never automatic course withdrawal.
+
+### Phase 2 class-platform deployment model (2026-09-27)
+**Decided:** Build toward an owned hybrid class platform: local classroom use over a local network during internet outages, plus remote access when internet or another approved network path is available. The operator selected this model after considering local-only and remote-connected alternatives.
+**Why:** It preserves local classroom operation during outages while allowing learners and organizations elsewhere to connect when online.
+**What was rejected:** A permanently isolated system as the sole model, and WhatsApp group management as the classroom platform. Keep the existing Phase 1 WhatsApp reminder channel unchanged.
+**Still unresolved:** Whether “interlink” refers to a specific product; local/cloud source of truth; offline write ownership; sync/idempotency/conflict rules; server and network deployment; authentication; privacy/security; backup and recovery. Local-only connectivity does not permit remote live participation during a WAN outage. No second data store, schema, API, production group, or migration is authorized until these designs are documented.

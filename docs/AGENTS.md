@@ -15,7 +15,7 @@ A daily automation that sends class reminders to students and reports engagement
 
 ## 2. Active Phase Boundary -- Read This Before Building Anything
 
-The operator explicitly activated Phase 2 (consent-based attendance) on 2026-09-27. Phase 1 remains the baseline and must be preserved. No class platform has been selected; the approved direction is a visible learner-initiated check-in only after verified learner login exists, with teacher corrections. The current repository has no learner login, so do not expose a student-facing check-in or accept a student ID alone. Before schema, API, or frontend changes, document session, late/partial/excused statuses, identity/access control, correction audit, consent/notice, and retention rules in `ARCHITECTURE.md` and `DECISIONS.md`. Do not start Phase 3 or later until the operator explicitly activates it.
+The operator activated Phase 2 (consent-based attendance) on 2026-09-27, then selected an owned class platform that supports local classroom use and remote access when online. This supersedes the earlier no-platform and WhatsApp-group classroom directions. Preserve the Phase 1 WhatsApp reminder service. Treat “local” as a classroom LAN/intranet that still connects devices to a nearby server; remote sites cannot join a live local session while disconnected. The exact local/cloud data authority and synchronization design are unresolved. The current repository has no learner login or attendance model, so do not expose attendance writes or accept a student ID alone. Before schema, API, or frontend changes, document data authority/sync, session, late/partial/excused statuses, identity/access control, correction audit, consent/notice, retention, security, and recovery rules in `ARCHITECTURE.md` and `DECISIONS.md`. Do not start Phase 3 or later until the operator explicitly activates it.
 
 **Phase 1 baseline to preserve without expanding it during Phase 2:**
 - Student, course, and enrollment data in Supabase (see `ARCHITECTURE.md` for schema)
@@ -25,9 +25,10 @@ The operator explicitly activated Phase 2 (consent-based attendance) on 2026-09-
 - A simple Next.js frontend that displays this data and can manually trigger the job -- nothing more
 
 **Active Phase 2 boundary:**
-- Design consent-based attendance using visible learner check-in after verified login and teacher corrections.
-- Until verified learner login is available, do not accept public attendance writes or student-ID-only check-ins.
-- Do not add attendance endpoints or screens until identity/access control and remaining privacy and attendance rules are documented.
+- Design an owned classroom platform for teachers and learners to share lessons/resources and complete classroom activities, usable on a local LAN without internet and remotely when internet is available.
+- Keep attendance explicit, consent-based, and separate from assignment/exercise evidence. Require verified identity and auditable teacher corrections; do not infer attendance or active learning from presence, message counts, read receipts, or passive device signals.
+- Until identity/access, local/cloud data authority, sync/conflict handling, session rules, consent/notice, retention, security, and recovery are documented, do not add attendance/platform schema, APIs, or screens.
+- A disconnected local hub can serve only devices connected to its local network; remote teaching during an internet outage is not promised.
 - Four consecutive absences may trigger supportive contact and human review; never automatically withdraw a student.
 
 **Later phases -- do not build or scaffold these until their phase is activated:**

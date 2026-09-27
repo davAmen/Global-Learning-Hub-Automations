@@ -167,6 +167,18 @@ Do not add new tables or columns without updating this file first.
 
 ---
 
+## Phase 2 — Hybrid local and remote class platform (design target)
+
+On 2026-09-27, the operator selected an owned class platform for local classroom use plus remote online access. The intended local arrangement is a classroom server reachable over a local Wi-Fi/LAN network even when that network has no internet connection. Remote learners and other sites require an internet or private-network path; a local hub cannot provide a live session to disconnected remote users.
+
+This target supersedes the earlier proposal to use WhatsApp group management as the classroom platform. Keep the existing Phase 1 WhatsApp reminder service unchanged unless separately reconsidered. The word “interlink” has not been confirmed as a particular product or technology; until clarified, interpret the network requirement as a local LAN/intranet.
+
+**Not yet designed:** the local/cloud source of truth, data ownership while disconnected, synchronization and conflict handling, local identity/access control, encryption, backups/recovery, and deployment/update operations. Phase 1 currently specifies Supabase as the only database and does not provide offline writes. Do not add a second database, schema, endpoints, or platform screens until the relationship between local storage and the remote service is documented and approved. Do not run a live cross-site synchronization or expose real learner data during development.
+
+The initial platform scope is classroom teaching and learning: teacher-managed lesson/resource delivery, learner activities, and transparent attendance/participation. Keep the public marketplace, billing, marketing, partnerships, and autonomous AI administration in their later roadmap phases. Attendance must be an explicit, consent-based record, require verified identity, and remain separate from assignment/exercise completion. A teacher must be able to correct records with an audit trail; no automatic withdrawal.
+
+**Research checked 2026-09-27:** Offline learning is not itself a new product category. Ghana's [CENDLOS iBox](https://cendlos.gov.gh/innovation) describes offline educational browsing, assessment, and resource sharing; [Kolibri](https://learningequality.org/kolibri/about-kolibri/) is designed to serve learners over a LAN without internet and distribute content offline; [Moodle's mobile app](https://docs.moodle.org/501/en/Moodle_app_offline_features) supports downloaded offline course work but documents unsupported activities and synchronization limitations. These are learning references, not endorsements or evidence that this project will outperform them. Do not claim “world first” or superior outcomes without validation.
+
 ## Channel Adapter Interface
 
 ```python

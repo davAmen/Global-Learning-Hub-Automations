@@ -24,8 +24,14 @@
 **Why:** These changes address auditability and accidental-contact risks while retaining GitHub-only work and the staged scope.
 **What was rejected:** Pushing before current-request authorization, force-pushing/merging the divergent local tree, and applying the nullable `reminder_log.enrollment_id` change to a live Supabase database without explicit authorization.
 
-## 2026-09-27, Phase 2 attendance check-in direction
+## 2026-09-27, Phase 2 attendance check-in direction — superseded in part
 
-**What was decided:** Phase 2 is activated for consent-based attendance. No class platform is selected; use visible learner-initiated check-in only after verified learner login exists, with auditable teacher corrections. The login and public check-in are not present yet.
+**Originally decided:** Phase 2 is activated for consent-based attendance. No class platform was selected; the initial design proposed visible learner-initiated check-in after verified learner login, with auditable teacher corrections. The no-platform direction was later superseded by the owned hybrid-platform decision below; the identity and correction safeguards remain.
 **Why:** The repository has no class-platform integration, learner authentication, or attendance model; accepting a student ID alone could allow impersonation.
 **What was rejected:** Covert sensing, attendance inferred from online/read status, and public check-ins using an unverified student ID. Define session, attendance-status, consent, correction, and retention rules before schema/API work.
+
+## 2026-09-27, Hybrid local and remote classroom platform selected
+
+**What was decided:** The operator wants an owned class platform that supports local classroom use over a LAN when internet is unavailable and remote online access when connectivity exists. This supersedes WhatsApp group management as the class-platform direction; the existing WhatsApp reminder service remains unchanged.
+**Why:** The operator wants teachers and learners to exchange lessons and resources locally while still enabling remote access.
+**What was rejected:** A permanently isolated platform as the only mode and a WhatsApp group as the classroom platform. “Interlink” remains undefined; assume LAN/intranet until clarified. The local/cloud source of truth, offline write ownership, synchronization/conflict rules, security, backup, and attendance policies must be decided before code or schema changes.
