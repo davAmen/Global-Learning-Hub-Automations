@@ -78,3 +78,9 @@
 **What was decided:** Send one device-readiness reminder weekly, asking learners to charge their devices for class and use a school-provided device where available.
 **Why:** The operator prefers a less frequent reminder rather than a message before every class.
 **What was rejected:** A reminder before every class. The exact day/time, wording, and channel remain undecided; this decision does not authorize sending messages or adding a channel.
+
+## 2026-09-27, Add multi-channel device-readiness notices to Phase 2
+
+**What was decided:** Add a separate weekly device-readiness notice to Phase 2, with the goal of reaching learners through approved student-facing channels including WhatsApp, email, SMS, and future approved channels. Preserve the Phase 1 WhatsApp daily reminder and Telegram backup unchanged. Use only channels each learner has opted into for this specific purpose.
+**Why:** The operator wants reliable reach across current and future communication options, particularly email and SMS, without disrupting the existing automation.
+**What was rejected:** Replacing or refactoring the Phase 1 reminder flow, blindly sending to every channel regardless of consent, or treating this scope change as permission to configure providers or send real messages. Provider/country rules, channel preferences or fallback behavior, schedule details, audit, retry, and rate limits must be designed before implementation.
