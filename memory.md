@@ -66,3 +66,9 @@
 **What was decided:** The operator prefers learners to use the devices they own rather than depending on shared classroom devices. Treat BYOD as the default design direction, without assuming every learner has a suitable or charged device or selecting phones/tablets/computers, a browser/native app, or a fallback process.
 **Why:** Learners should be able to access class resources on their own devices.
 **What was rejected:** Making shared classroom devices the default. Accessibility fallback, supported device types, and secure offline session/cache behavior remain to be designed; this does not authorize implementation or a real pilot.
+
+## 2026-09-27, Device-readiness reminders and school-device fallback
+
+**What was decided:** Periodically remind students to charge their own devices before class; use a school-provided device where available. Reminder cadence, wording, and delivery channel are not yet selected, and no live message is authorized.
+**Why:** A charged personal device supports class participation, while school equipment can help when available.
+**What was rejected:** Assuming every learner will always have a charged, working personal device, or treating this policy as permission for unsolicited or immediate messaging. Any future notice must follow the chosen channel's consent and opt-out rules.

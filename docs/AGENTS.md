@@ -27,6 +27,7 @@ The operator activated Phase 2 (consent-based attendance) on 2026-09-27, then se
 **Active Phase 2 boundary:**
 - Design an owned classroom platform for teachers and learners to share lessons/resources and complete classroom activities, usable on a local LAN without internet and remotely when internet is available.
 - Prefer learners' own devices (BYOD); do not assume every learner has the same device or select a native app/browser architecture yet. Plan accessible fallback access before any pilot.
+- Include periodic device-readiness notices: remind learners to charge devices before class and use a school-provided device where available. Cadence and delivery channel remain undecided; this is not permission to send messages or add a channel.
 - Keep attendance explicit, consent-based, and separate from assignment/exercise evidence. Require verified identity and auditable teacher corrections; do not infer attendance or active learning from presence, message counts, read receipts, or passive device signals.
 - The high-level sync direction is documented and approved; exact event fields, transport security, offline credential freshness/expiry, session/status rules, correction audit, consent/notice, retention, and recovery remain open. Do not add attendance/platform schema, APIs, or screens until those implementation decisions and the pilot scope are documented and approved.
 - A disconnected local hub can serve only devices connected to its local network; remote teaching during an internet outage is not promised.
