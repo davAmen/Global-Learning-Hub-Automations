@@ -27,7 +27,7 @@ A roadmap item is not permission to implement it. Preserve verified Phase 1 beha
 - `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` define the current Phase 1 implementation and decisions. `docs/PLATFORM_BRIEF.md` defines the already-approved public learning platform direction; this prompt adds the operator's attendance, classroom-agent, marketing, and partnership goals without replacing that brief.
 - The canonical target test suite was run in the Phase 2 worktree on 2026-09-27: 18 passed, with one Starlette test-client deprecation warning.
 - Phase 2 was explicitly activated on 2026-09-27. The operator selected an owned classroom platform for local use over a LAN during internet outages and remote access when online. This supersedes the earlier no-platform and WhatsApp-group classroom directions; preserve the separate Phase 1 WhatsApp reminder service. Each site's hub is the planned authority for records created during local offline classes, then syncs them online when connectivity returns. Detailed sync, retry, conflict, correction, and recovery rules remain unresolved; the current repository has no learner login or attendance model. Define identity/access, session/timezone rules, late/partial/excused states, correction audit, notice/consent, retention, security, backup, and conflict handling before schema/API changes. Do not promise remote live sessions during a site internet outage.
-- No real student data, controlled pilot, live sends, production payment credentials, or public launch have been authorized by this roadmap.
+- No real student data, controlled pilot, live sends, production payment credentials, or public launch have been authorized by this roadmap. The one-site/one-class Phase 2 workflow is only a provisional planning assumption, not pilot authorization; see `docs/ARCHITECTURE.md` for the proposed offline/reconnect flow and unresolved decisions.
 
 ## Rules that apply to every phase
 
@@ -78,6 +78,8 @@ Preserve the Supabase model, daily scheduler, three engagement states, WhatsApp-
 ### Phase 2 — Consent-based attendance and transparent participation
 
 Design the owned hybrid classroom platform: local lesson delivery and activity capture over a site LAN, with remote access and synchronization when online. First decide which side owns each record during an outage and how reconnecting devices synchronize safely; retain one clearly defined authority for each record. Define identity, session, late/partial attendance, excused absence, explicit attendance evidence, correction, consent, retention, security, and recovery before schema changes. Keep attendance separate from learning evidence. Local-only operation does not mean remote devices can join a live session without a network path.
+
+Before any implementation, review and approve the pilot scope and finish the open identity/offline-access, remote-record ownership, session/status, privacy/consent, sync/conflict, security, backup, and hub-operation decisions. Proposed duplicate-safe acknowledged retries and human review of conflicts are not yet a selected sync protocol.
 
 **Exit gate:** learners can understand and correct records; four consecutive absences produce supportive contact and human review; no covert monitoring or automatic withdrawal. Any database migration requires separate explicit authorization.
 

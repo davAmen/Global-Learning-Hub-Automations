@@ -42,3 +42,9 @@
 **Why:** This allows local classes to continue and record work without internet while retaining remote access when online.
 **What was rejected:** Requiring the cloud to be reachable for every classroom write, or silently letting the cloud overwrite locally authoritative records.
 **Still unresolved:** Sync acknowledgements/retries, duplicate handling, event ordering, remote-origin record ownership, corrections/conflicts, local storage, and backup/restore.
+
+## 2026-09-27, Draft one-site classroom pilot workflow (proposal only)
+
+**What was decided:** Record one learning site and one class as a provisional planning assumption, not as confirmed pilot scope or authorization to use real learner data. Recommend explicit learner check-in, separate assignment evidence, teacher-audited corrections, visible offline/sync status, duplicate-safe acknowledged retries, and human review of conflicting edits.
+**Why:** A small synthetic-data exercise can test the core local-classroom and reconnect flow without pretending that unresolved security, account, conflict, or recovery decisions are settled.
+**What was rejected:** Treating the planning assumption as a launched pilot; using passive signals as attendance; silently overwriting local records; or automatically disciplining/withdrawing learners.
