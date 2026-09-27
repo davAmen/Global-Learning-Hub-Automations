@@ -49,8 +49,14 @@
 **Why:** A small synthetic-data exercise can test the core local-classroom and reconnect flow without pretending that unresolved security, account, conflict, or recovery decisions are settled.
 **What was rejected:** Treating the planning assumption as a launched pilot; using passive signals as attendance; silently overwriting local records; or automatically disciplining/withdrawing learners.
 
-## 2026-09-27, Research-informed hybrid sync recommendation (pending approval)
+## 2026-09-27, Research-informed hybrid sync recommendation (operator-confirmed)
 
-**What was decided:** Recommend the site hub as authority for locally created class records and the cloud as authority for remote-origin records. If the site's internet is down, onsite class continues locally and remote users can use the cloud separately, but the platform must not claim they are in the same live room. Proposed sync uses a durable outbox, stable event IDs, acknowledgements, idempotent retry, and human review of conflicts.
+**What was decided:** The operator confirmed the high-level direction: the site hub is authoritative for locally created class records and the cloud for remote-origin records. If the site's internet is down, the onsite class continues locally and remote users may use the cloud separately, but the platform must not claim they are in the same live room. Sync direction is a durable outbox, stable event IDs, acknowledgements, duplicate-safe retries, per-origin ordering, and human review of conflicts. This is not approval of code, schema, deployment, a real pilot, or real learner data.
 **Why:** Official offline-learning references show local serving and syncing are feasible, while Moodle's documented limitations and CouchDB's documented conflict handling show offline activity timestamps and merge behavior need explicit application rules.
 **What was rejected:** Assuming Supabase replication alone solves offline application sync, silently applying “winning” edits to attendance, or requiring disconnected sites to reach the cloud for each write.
+
+## 2026-09-27, Offline sign-in recommendation (pending approval)
+
+**What was decided:** No sign-in policy has been selected. Recommend individual accounts established before an outage, with the minimum active-class roster and protected credential-verification data available to the local hub. As a conservative first-pilot proposal, cached access would expire at the end of the scheduled class/day; after expiry, learners could read already-approved materials but could not create verified attendance records until access is refreshed. Failed sign-ins should be throttled; shared devices should use short, inactivity-limited sessions.
+**Why:** A disconnected hub cannot learn immediately about a cloud-side account revocation. Limiting offline authorization reduces stale-access risk while allowing a class to finish.
+**What was rejected:** Student ID alone, shared class passwords, QR codes alone, offline account enrollment/reset/role changes, and impersonating a learner who cannot sign in. The expiry window, device model, learner identity checks, recovery, and local revocation process remain undecided; this recommendation is not authorization to implement authentication or use real learner data.
