@@ -21,11 +21,12 @@ A roadmap item is not permission to implement it. Preserve verified Phase 1 beha
 
 ## Current repository and handoff
 
-- The canonical integration target selected by the operator is `davAmen/Global-Learning-Hub-Automations`. This checkout is on `reconcile/github-main`, created from the fetched GitHub `main` commit `5a42b85`; the prior local `main` remains separate and must be preserved.
+- The canonical integration target selected by the operator is `davAmen/Global-Learning-Hub-Automations`. Phase 1 PR #3 was merged to GitHub `main` at `aac1957` on 2026-09-27. The active clean worktree is on `feat/phase-2-attendance`, based on that merge commit. The older local `main` remains separate and must be preserved.
 - This checkout's backend is at repository root (`src/`, `scripts/`, `tests/`) and has no checked-in frontend directory. `docs/ARCHITECTURE.md` describes a Next.js frontend as a separate tree, so confirm its actual repository/location before frontend work.
 - The prior local checkout used `backend/` and `frontend/`. At reconciliation, Git showed seven local-only commits and four GitHub-only commits. Do not merge or push either whole tree blindly. Review and port only the changes that fit this repository and preserve its GitHub-only security and product documentation.
 - `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` define the current Phase 1 implementation and decisions. `docs/PLATFORM_BRIEF.md` defines the already-approved public learning platform direction; this prompt adds the operator's attendance, classroom-agent, marketing, and partnership goals without replacing that brief.
-- The operator previously shared a test result of 8 passed and one Starlette test-client deprecation warning from the other checkout. It is not proof that tests pass in this target branch; run the tests here before relying on it.
+- The canonical target test suite was run in the Phase 2 worktree on 2026-09-27: 18 passed, with one Starlette test-client deprecation warning.
+- Phase 2 was explicitly activated on 2026-09-27. No class platform is selected; the approved direction is a visible learner-initiated check-in only after verified learner login exists, with teacher corrections. The current repository has no learner login, so student-facing check-in remains disabled. Define session/timezone rules, late/partial/excused states, correction audit, notice/consent, and retention before schema or API changes.
 - No real student data, controlled pilot, live sends, production payment credentials, or public launch have been authorized by this roadmap.
 
 ## Rules that apply to every phase

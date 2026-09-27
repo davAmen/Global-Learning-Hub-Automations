@@ -56,3 +56,9 @@ When a new decision is made during this project, add it to this file in the same
 **Why:** The Phase 1 rules require every send attempt to be auditable, and an administrator report is not tied to one enrollment. Reusing the existing table avoids adding a second source of truth.
 **Safeguard:** Update the schema specification only. Do not migrate or otherwise change a live database without separate explicit authorization. If the deployed schema still requires `enrollment_id`, fail closed and do not send an unlogged report.
 **What was rejected:** Leaving administrator sends unlogged, assigning them to a fake student enrollment, or introducing another audit table.
+
+### Phase 2 attendance source and login gate (2026-09-27)
+**Decided:** No class-platform integration is selected for the initial attendance design. Use a visible, learner-initiated check-in only after verified learner login exists, with teacher corrections that are auditable. The operator selected this approach when activating Phase 2.
+**Why:** The selected repository has no class-platform integration, learner authentication, or attendance model. Accepting a student ID alone could allow someone to record attendance for another learner.
+**What was rejected:** Covert sensing, attendance inferred from online/read status, and public check-ins that trust an unverified student ID.
+**Still to define before schema/API changes:** Session/timezone rules, late/partial/excused attendance, source and correction audit details, learner notice/consent, and retention. Four consecutive absences may result in supportive contact and human review only, never automatic course withdrawal.

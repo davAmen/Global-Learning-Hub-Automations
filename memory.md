@@ -23,3 +23,9 @@
 **What was decided:** Keep the reviewed changes on local branch `reconcile/github-main`, based on the selected repository's fetched `main`; preserve the old local `main`. The branch currently includes the roadmap, reminder pre-send logging, report-attempt logging, missing WhatsApp-recipient guard, and fictional seed recipients. Latest full test run: 18 passed, 1 Starlette deprecation warning.
 **Why:** These changes address auditability and accidental-contact risks while retaining GitHub-only work and the staged scope.
 **What was rejected:** Pushing before current-request authorization, force-pushing/merging the divergent local tree, and applying the nullable `reminder_log.enrollment_id` change to a live Supabase database without explicit authorization.
+
+## 2026-09-27, Phase 2 attendance check-in direction
+
+**What was decided:** Phase 2 is activated for consent-based attendance. No class platform is selected; use visible learner-initiated check-in only after verified learner login exists, with auditable teacher corrections. The login and public check-in are not present yet.
+**Why:** The repository has no class-platform integration, learner authentication, or attendance model; accepting a student ID alone could allow impersonation.
+**What was rejected:** Covert sensing, attendance inferred from online/read status, and public check-ins using an unverified student ID. Define session, attendance-status, consent, correction, and retention rules before schema/API work.

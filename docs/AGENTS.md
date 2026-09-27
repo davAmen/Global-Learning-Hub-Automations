@@ -15,21 +15,26 @@ A daily automation that sends class reminders to students and reports engagement
 
 ## 2. Active Phase Boundary -- Read This Before Building Anything
 
-The operator has explicitly requested a wider, staged learning-platform roadmap. `MASTER_PROMPT.md` connects that request to the existing `PLATFORM_BRIEF.md`. This authorizes planning and phase-by-phase work, not building every feature at once. Phase 1 remains the current implementation; repository/decision alignment is the active Phase 0 task. Do not start another implementation phase until the operator explicitly activates it.
+The operator explicitly activated Phase 2 (consent-based attendance) on 2026-09-27. Phase 1 remains the baseline and must be preserved. No class platform has been selected; the approved direction is a visible learner-initiated check-in only after verified learner login exists, with teacher corrections. The current repository has no learner login, so do not expose a student-facing check-in or accept a student ID alone. Before schema, API, or frontend changes, document session, late/partial/excused statuses, identity/access control, correction audit, consent/notice, and retention rules in `ARCHITECTURE.md` and `DECISIONS.md`. Do not start Phase 3 or later until the operator explicitly activates it.
 
-**Current Phase 1 implementation scope:**
+**Phase 1 baseline to preserve without expanding it during Phase 2:**
 - Student, course, and enrollment data in Supabase (see `ARCHITECTURE.md` for schema)
 - A daily scheduled job that determines who needs a reminder
 - Sending that reminder through exactly ONE delivery channel (WhatsApp active, Telegram backup)
 - A daily report of engagement, sent to the administrator
 - A simple Next.js frontend that displays this data and can manually trigger the job -- nothing more
 
-**Not part of Phase 1 -- do not build or scaffold these until their phase is activated:**
+**Active Phase 2 boundary:**
+- Design consent-based attendance using visible learner check-in after verified login and teacher corrections.
+- Until verified learner login is available, do not accept public attendance writes or student-ID-only check-ins.
+- Do not add attendance endpoints or screens until identity/access control and remaining privacy and attendance rules are documented.
+- Four consecutive absences may trigger supportive contact and human review; never automatically withdraw a student.
+
+**Later phases -- do not build or scaffold these until their phase is activated:**
 - A second or third delivery channel as active (Telegram is the only backup)
 - Engagement scoring beyond three simple states: active / low_engagement / needs_followup
-- Any editing/write screens in the frontend beyond the single "run job now" button
 - A polished or styled admin UI/dashboard -- functional and plain is correct
-- Attendance monitoring, classroom AI operations, marketplace, billing, marketing, partnerships, or anything else assigned to a later phase in `MASTER_PROMPT.md`
+- Classroom AI operations, catalog/marketplace, billing, marketing, partnerships, or anything else assigned to a later phase in `MASTER_PROMPT.md`
 - Any new third-party service, library, or architectural pattern not already named in `ARCHITECTURE.md`
 
 **If a task requires work outside the active phase, stop and identify the phase and prerequisites instead of proceeding.**
