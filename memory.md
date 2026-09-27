@@ -59,4 +59,10 @@
 
 **What was decided:** No sign-in policy has been selected. Recommend individual accounts established before an outage, with the minimum active-class roster and protected credential-verification data available to the local hub. As a conservative first-pilot proposal, cached access would expire at the end of the scheduled class/day; after expiry, learners could read already-approved materials but could not create verified attendance records until access is refreshed. Failed sign-ins should be throttled; shared devices should use short, inactivity-limited sessions.
 **Why:** A disconnected hub cannot learn immediately about a cloud-side account revocation. Limiting offline authorization reduces stale-access risk while allowing a class to finish.
-**What was rejected:** Student ID alone, shared class passwords, QR codes alone, offline account enrollment/reset/role changes, and impersonating a learner who cannot sign in. The expiry window, device model, learner identity checks, recovery, and local revocation process remain undecided; this recommendation is not authorization to implement authentication or use real learner data.
+**What was rejected:** Student ID alone, shared class passwords, QR codes alone, offline account enrollment/reset/role changes, and impersonating a learner who cannot sign in. At the time this recommendation was recorded, the device model was undecided; the operator later preferred learner-owned devices (see below). The expiry window, learner identity checks, recovery, and local revocation process remain undecided; this recommendation is not authorization to implement authentication or use real learner data.
+
+## 2026-09-27, Learner-owned devices preferred
+
+**What was decided:** The operator prefers learners to use the devices they own rather than depending on shared classroom devices. Treat BYOD as the default design direction, without assuming every learner has a suitable or charged device or selecting phones/tablets/computers, a browser/native app, or a fallback process.
+**Why:** Learners should be able to access class resources on their own devices.
+**What was rejected:** Making shared classroom devices the default. Accessibility fallback, supported device types, and secure offline session/cache behavior remain to be designed; this does not authorize implementation or a real pilot.
