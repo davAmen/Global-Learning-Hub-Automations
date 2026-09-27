@@ -21,9 +21,9 @@ def seed():
         db.table("courses").upsert(c, on_conflict="id").execute()
 
     students = [
-        {"id": str(uuid.uuid4()), "name": "Kwame Mensah", "phone": "+233501234567", "email": "kwame@example.com"},
-        {"id": str(uuid.uuid4()), "name": "Ama Boateng", "phone": "+233502345678", "email": "ama@example.com"},
-        {"id": str(uuid.uuid4()), "name": "Kofi Asante", "phone": "+233503456789", "email": "kofi@example.com"},
+        {"id": str(uuid.uuid4()), "name": "Kwame Mensah", "phone": "+15555550101", "email": "kwame@example.com"},
+        {"id": str(uuid.uuid4()), "name": "Ama Boateng", "phone": "+15555550102", "email": "ama@example.com"},
+        {"id": str(uuid.uuid4()), "name": "Kofi Asante", "phone": "+15555550103", "email": "kofi@example.com"},
     ]
     for s in students:
         s["created_at"] = datetime.now().isoformat()

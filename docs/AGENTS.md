@@ -13,24 +13,26 @@ A daily automation that sends class reminders to students and reports engagement
 
 ---
 
-## 2. Hard Scope Boundary -- Read This Before Building Anything
+## 2. Active Phase Boundary -- Read This Before Building Anything
 
-**In scope for this build:**
+The operator has explicitly requested a wider, staged learning-platform roadmap. `MASTER_PROMPT.md` connects that request to the existing `PLATFORM_BRIEF.md`. This authorizes planning and phase-by-phase work, not building every feature at once. Phase 1 remains the current implementation; repository/decision alignment is the active Phase 0 task. Do not start another implementation phase until the operator explicitly activates it.
+
+**Current Phase 1 implementation scope:**
 - Student, course, and enrollment data in Supabase (see `ARCHITECTURE.md` for schema)
 - A daily scheduled job that determines who needs a reminder
 - Sending that reminder through exactly ONE delivery channel (WhatsApp active, Telegram backup)
 - A daily report of engagement, sent to the administrator
 - A simple Next.js frontend that displays this data and can manually trigger the job -- nothing more
 
-**Out of scope -- do not build, scaffold, or suggest these:**
+**Not part of Phase 1 -- do not build or scaffold these until their phase is activated:**
 - A second or third delivery channel as active (Telegram is the only backup)
 - Engagement scoring beyond three simple states: active / low_engagement / needs_followup
 - Any editing/write screens in the frontend beyond the single "run job now" button
 - A polished or styled admin UI/dashboard -- functional and plain is correct
-- Student onboarding automation, course detection, AI assistant features, or anything else from later phases
+- Attendance monitoring, classroom AI operations, marketplace, billing, marketing, partnerships, or anything else assigned to a later phase in `MASTER_PROMPT.md`
 - Any new third-party service, library, or architectural pattern not already named in `ARCHITECTURE.md`
 
-**If a task seems to require going outside this list, stop and say so explicitly instead of proceeding.**
+**If a task requires work outside the active phase, stop and identify the phase and prerequisites instead of proceeding.**
 
 ---
 

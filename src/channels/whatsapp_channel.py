@@ -19,6 +19,11 @@ class WhatsAppChannel(Channel):
     name = "whatsapp"
 
     def send(self, student, message: str) -> bool:
+        phone = getattr(student, "phone", None)
+        if not isinstance(phone, str) or not phone.strip():
+            logger.error("WhatsApp recipient is missing a phone number.")
+            return False
+
         settings = get_settings()
         if not (settings.whatsapp_token and settings.whatsapp_phone_id):
             logger.error("WhatsApp not configured.")
@@ -31,7 +36,7 @@ class WhatsAppChannel(Channel):
         }
         payload = {
             "messaging_product": "whatsapp",
-            "to": student.phone,
+            "to": phone.strip(),
             "type": "text",
             "text": {"preview_url": False, "body": message},
         }
