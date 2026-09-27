@@ -89,10 +89,16 @@
 
 **What was decided:** Send the weekly device-readiness notice through the learner's preferred channel first, then use a permitted fallback only if needed. Do not send simultaneously on all channels. Fallback must be separately opted into for this notice and must never bypass an opt-out.
 **Why:** The operator prefers a primary route with a backup rather than duplicate messages across every platform.
-**What was rejected:** Simultaneous broadcasts to every channel. At the time, whether each student must select a preferred channel was open; the operator later required it (see below). Exact fallback priority, confirmed-failure criteria, wait period, and handling of uncertain delivery status remain open to prevent duplicates; this decision does not authorize provider setup or live sends.
+**What was rejected:** Simultaneous broadcasts to every channel. At the time, whether each student must select a preferred channel was open; the operator later required it (see below). The fallback-channel ranking was also open and is resolved in the next entry. Confirmed-failure criteria, wait period, and handling of uncertain delivery status remain open to prevent duplicates; this decision does not authorize provider setup or live sends.
 
 ## 2026-09-27, Students choose their preferred notice channel
 
 **What was decided:** Each student must choose a preferred channel for the weekly device-readiness notice. Try that channel first, then use a permitted fallback if needed. The preference selection is separate from consent; require purpose-specific opt-in on every channel used, and do not send until both required preference and consent are recorded.
 **Why:** The operator wants students to choose how they are contacted rather than having the system impose a default.
-**What was rejected:** Assigning a default preferred channel or treating channel selection as consent. Fallback order and failure/unknown-status rules remain open; do not bypass opt-outs or send duplicate notices across channels.
+**What was rejected:** Assigning a default preferred channel or treating channel selection as consent. At first, fallback order was left open; the operator later required students to choose it (see below). Failure/unknown-status rules remain open; do not bypass opt-outs or send duplicate notices across channels.
+
+## 2026-09-27, Students choose their fallback-channel order
+
+**What was decided:** Each student chooses and ranks any opted-in fallback channels behind their preferred channel; attempts follow that order. No simultaneous cross-channel broadcast. Channel ranking does not replace separate consent for each channel.
+**Why:** The operator wants students—not a system default—to decide the order in which their selected channels are tried.
+**What was rejected:** A fixed system-wide fallback order. Failure definitions and handling of uncertain delivery remain to be designed to prevent duplicates; this decision does not authorize provider setup or live sends.
