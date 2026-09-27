@@ -83,4 +83,10 @@
 
 **What was decided:** Add a separate weekly device-readiness notice to Phase 2, with the goal of reaching learners through approved student-facing channels including WhatsApp, email, SMS, and future approved channels. Preserve the Phase 1 WhatsApp daily reminder and Telegram backup unchanged. Use only channels each learner has opted into for this specific purpose.
 **Why:** The operator wants reliable reach across current and future communication options, particularly email and SMS, without disrupting the existing automation.
-**What was rejected:** Replacing or refactoring the Phase 1 reminder flow, blindly sending to every channel regardless of consent, or treating this scope change as permission to configure providers or send real messages. Provider/country rules, channel preferences or fallback behavior, schedule details, audit, retry, and rate limits must be designed before implementation.
+**What was rejected:** Replacing or refactoring the Phase 1 reminder flow, blindly sending to every channel regardless of consent, or treating this scope change as permission to configure providers or send real messages. At the time this scope was recorded, channel preferences/fallback behavior were open; the operator later selected preferred-channel-first with fallback (see below). Provider/country rules, schedule details, audit, retry, and rate limits must be designed before implementation.
+
+## 2026-09-27, Preferred channel with fallback selected for device notices
+
+**What was decided:** Send the weekly device-readiness notice through the learner's preferred channel first, then use a permitted fallback only if needed. Do not send simultaneously on all channels. Fallback must be separately opted into for this notice and must never bypass an opt-out.
+**Why:** The operator prefers a primary route with a backup rather than duplicate messages across every platform.
+**What was rejected:** Simultaneous broadcasts to every channel. Exact priority, confirmed-failure criteria, wait period, and handling of uncertain delivery status remain open to prevent duplicates; this decision does not authorize provider setup or live sends.
