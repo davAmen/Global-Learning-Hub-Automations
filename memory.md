@@ -108,3 +108,9 @@
 **What was decided:** Try a student's next ranked, opted-in channel only after the current provider confirms a terminal delivery failure. Pending or unknown status is not failure and must not trigger fallback until the result is reconciled.
 **Why:** Falling back while the first provider may still deliver could cause the student to receive duplicate reminders.
 **What was rejected:** Treating a timeout, pending status, or ambiguous provider response as proof of failure. Provider-specific failure mapping, retry limits, and reconciliation timing remain to be designed; no provider integration or live send is authorized.
+
+## 2026-09-27, Global audience with country-by-country channel approval
+
+**What was decided:** The intended student audience is global. Treat this as a reach goal, not proof that every channel/provider works in every country. Review each destination for coverage, sender registration, cost, local messaging requirements, consent, and delivery-status reliability before enabling it. Preserve Phase 1 unchanged; no provider or first destination country has been selected.
+**Why:** Official provider documentation shows international SMS sender rules and delivery receipts vary by country, while email providers require delivery and bounce/complaint operations.
+**What was rejected:** Assuming one SMS sender/provider covers the world or automatically enabling worldwide routes. Provider comparisons should start once the first learner markets are known; no provider integration or live sending is authorized.
