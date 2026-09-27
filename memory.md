@@ -35,3 +35,10 @@
 **What was decided:** The operator wants an owned class platform that supports local classroom use over a LAN when internet is unavailable and remote online access when connectivity exists. This supersedes WhatsApp group management as the class-platform direction; the existing WhatsApp reminder service remains unchanged.
 **Why:** The operator wants teachers and learners to exchange lessons and resources locally while still enabling remote access.
 **What was rejected:** A permanently isolated platform as the only mode and a WhatsApp group as the classroom platform. “Interlink” remains undefined; assume LAN/intranet until clarified. The local/cloud source of truth, offline write ownership, synchronization/conflict rules, security, backup, and attendance policies must be decided before code or schema changes.
+
+## 2026-09-27, Local classroom hub authority selected
+
+**What was decided:** For each site, its local hub is the authoritative record keeper for class records created there during internet outages; it syncs those records to the online service after connectivity returns.
+**Why:** This allows local classes to continue and record work without internet while retaining remote access when online.
+**What was rejected:** Requiring the cloud to be reachable for every classroom write, or silently letting the cloud overwrite locally authoritative records.
+**Still unresolved:** Sync acknowledgements/retries, duplicate handling, event ordering, remote-origin record ownership, corrections/conflicts, local storage, and backup/restore.
