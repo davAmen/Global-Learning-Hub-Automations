@@ -126,3 +126,15 @@
 **What was decided:** For the Ghana weekly notice, retain direct Meta Cloud API as the WhatsApp candidate already in the project, evaluate Amazon SES for low-cost email, and compare Twilio's published SMS rate against Vonage's account-specific rate table before any activation. Require a pre-approved SMS spend limit while preserving each student's channel choice and separate consent. This is research guidance, not a provider decision or permission to configure or send.
 **Why:** Meta already serves the Phase 1 WhatsApp path; SES has low published per-email prices but has sandbox and setup requirements; Twilio's Ghana SMS per-segment rate is high and Vonage requires an account-specific quote.
 **What was rejected:** Adding an unreviewed vendor, treating SMS as a default, or selecting a route solely on headline price. The existing WhatsApp sender uses a plain text request; verify approved-template support before scheduled messages outside the 24-hour service window.
+
+## 2026-09-28, Cap first Phase 2 notice cohort at 30 paid learners
+
+**What was decided:** The first cohort for the additive weekly device-readiness notice should be no more than 30 learners, with verified course payment required for eligibility. Keep the Phase 1 daily reminder system unchanged. Each learner still needs separate purpose- and channel-specific consent; payment is not consent. This is not authorization for real learner data or live messages.
+**Why:** The operator wants to control initial costs and direct reminders to learners committed to a course.
+**What was rejected:** Sending to all 500 prospective learners, changing Phase 1 reminder eligibility, or treating payment as permission to message.
+
+## 2026-09-28, Use manual WhatsApp or a mock for a no-cost trial
+
+**What was decided:** The free-to-download WhatsApp Business App is a possible manual one-to-one route for a small opted-in pilot; for local software tests, use a mocked/no-send channel. Neither is an automated Platform API integration, and Business Broadcast availability in Ghana is unconfirmed.
+**Why:** It allows low-cost learning without unofficial WhatsApp Web automation or assuming that proactive API messages are free.
+**What was rejected:** Describing the official WhatsApp Business Platform as free for scheduled proactive reminders, or automating WhatsApp Web.
