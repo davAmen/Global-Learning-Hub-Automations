@@ -120,3 +120,9 @@
 **What was decided:** Ghana is the first market to assess for the global weekly device-readiness notice. This is not authorization to enable WhatsApp, SMS, email, any provider, a pilot, or live messages. Check local consent/privacy rules, the NCA's current international A2P position, network-specific sender registration, provider cost and delivery evidence before an implementation decision.
 **Why:** The operator identified Ghana as the first learner market; official sources show opt-in and data-protection duties and evolving provider/regulatory SMS requirements.
 **What was rejected:** Treating Ghana as automatically covered or treating one provider's routing notes as Ghana-wide legal approval.
+
+## 2026-09-28, Ghana channel shortlist researched but not selected
+
+**What was decided:** For the Ghana weekly notice, retain direct Meta Cloud API as the WhatsApp candidate already in the project, evaluate Amazon SES for low-cost email, and compare Twilio's published SMS rate against Vonage's account-specific rate table before any activation. Require a pre-approved SMS spend limit while preserving each student's channel choice and separate consent. This is research guidance, not a provider decision or permission to configure or send.
+**Why:** Meta already serves the Phase 1 WhatsApp path; SES has low published per-email prices but has sandbox and setup requirements; Twilio's Ghana SMS per-segment rate is high and Vonage requires an account-specific quote.
+**What was rejected:** Adding an unreviewed vendor, treating SMS as a default, or selecting a route solely on headline price. The existing WhatsApp sender uses a plain text request; verify approved-template support before scheduled messages outside the 24-hour service window.
