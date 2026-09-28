@@ -138,3 +138,9 @@
 **What was decided:** The free-to-download WhatsApp Business App is a possible manual one-to-one route for a small opted-in pilot; for local software tests, use a mocked/no-send channel. Neither is an automated Platform API integration, and Business Broadcast availability in Ghana is unconfirmed.
 **Why:** It allows low-cost learning without unofficial WhatsApp Web automation or assuming that proactive API messages are free.
 **What was rejected:** Describing the official WhatsApp Business Platform as free for scheduled proactive reminders, or automating WhatsApp Web.
+
+## 2026-09-28, Manually verify payment for the first 30-learner cohort
+
+**What was decided:** An administrator will manually verify course payment for the first cohort of up to 30 learners; do not add a checkout/payment provider now. Payment eligibility applies only to the new Phase 2 weekly notice and does not replace separate channel-specific consent. The Supabase record and audit workflow remain to be designed; this is not authorization for a live migration or send.
+**Why:** Manual verification keeps the initial pilot simple and avoids introducing billing scope before the later payment phase.
+**What was rejected:** Treating an active enrollment as proof of payment or adding a payment gateway before the billing phase.
