@@ -111,6 +111,12 @@
 
 ## 2026-09-27, Global audience with country-by-country channel approval
 
-**What was decided:** The intended student audience is global. Treat this as a reach goal, not proof that every channel/provider works in every country. Review each destination for coverage, sender registration, cost, local messaging requirements, consent, and delivery-status reliability before enabling it. Preserve Phase 1 unchanged; no provider or first destination country has been selected.
+**What was decided:** The intended student audience is global. Treat this as a reach goal, not proof that every channel/provider works in every country. Review each destination for coverage, sender registration, cost, local messaging requirements, consent, and delivery-status reliability before enabling it. Preserve Phase 1 unchanged; no provider is selected.
 **Why:** Official provider documentation shows international SMS sender rules and delivery receipts vary by country, while email providers require delivery and bounce/complaint operations.
 **What was rejected:** Assuming one SMS sender/provider covers the world or automatically enabling worldwide routes. Provider comparisons should start once the first learner markets are known; no provider integration or live sending is authorized.
+
+## 2026-09-28, Ghana selected for first channel-readiness review
+
+**What was decided:** Ghana is the first market to assess for the global weekly device-readiness notice. This is not authorization to enable WhatsApp, SMS, email, any provider, a pilot, or live messages. Check local consent/privacy rules, the NCA's current international A2P position, network-specific sender registration, provider cost and delivery evidence before an implementation decision.
+**Why:** The operator identified Ghana as the first learner market; official sources show opt-in and data-protection duties and evolving provider/regulatory SMS requirements.
+**What was rejected:** Treating Ghana as automatically covered or treating one provider's routing notes as Ghana-wide legal approval.
