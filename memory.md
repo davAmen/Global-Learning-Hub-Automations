@@ -141,6 +141,12 @@
 
 ## 2026-09-28, Manually verify payment for the first 30-learner cohort
 
-**What was decided:** An administrator will manually verify course payment for the first cohort of up to 30 learners; do not add a checkout/payment provider now. Payment eligibility applies only to the new Phase 2 weekly notice and does not replace separate channel-specific consent. The Supabase record and audit workflow remain to be designed; this is not authorization for a live migration or send.
+**What was decided:** An administrator will manually verify course payment for the first cohort of up to 30 learners; do not add a checkout/payment provider now. Payment eligibility applies only to the new Phase 2 weekly notice and does not replace separate channel-specific consent. The record and audit design was resolved in the following decision; no live migration or send is authorized.
 **Why:** Manual verification keeps the initial pilot simple and avoids introducing billing scope before the later payment phase.
 **What was rejected:** Treating an active enrollment as proof of payment or adding a payment gateway before the billing phase.
+
+## 2026-09-28, Store payment and channel consent as separate append-only events
+
+**What was decided:** For the Phase 2 weekly notice, track payment verification/revocation per enrollment and opt-in/opt-out per learner, purpose, and channel in separate append-only event logs. The latest event controls current state; require an active enrollment, latest payment verification, and a current opt-in for each attempted channel. Keep these changes local until separately authorized migration; do not add a write endpoint until actor identity and learner consent capture are safe.
+**Why:** Separate histories preserve auditability and withdrawals without treating payment or channel preference as consent.
+**What was rejected:** One mutable paid flag, global consent, or inferring payment/consent from active enrollment.
