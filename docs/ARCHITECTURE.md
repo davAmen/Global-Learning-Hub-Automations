@@ -36,6 +36,8 @@ global-learning-hub-automation/
 
     api/
       __init__.py
+      readiness_auth.py         # validates Supabase Auth users for Phase 2 notice writes
+      routes_readiness.py       # local payment, consent, and channel-preference records
       routes_jobs.py            # POST /run-daily-job
       routes_webhooks.py        # POST /webhooks/{channel}
       routes_reports.py         # GET /reports/today
@@ -80,6 +82,7 @@ global-learning-hub-automation/
     test_reports.py
     test_api.py
     test_weekly_readiness.py    # synthetic Phase 2 eligibility tests
+    test_readiness_api.py       # fake-identity Phase 2 write-route tests
 
   docs/
     ARCHITECTURE.md
@@ -214,11 +217,17 @@ The source schema defines two separate append-only event logs for the weekly dev
 - `enrollment_payment_verification_events` records `verified` or `revoked` for a specific enrollment, with the event time and the identifier of the staff member who recorded it. Do not store amounts, bank/card details, receipts, or payment-provider data. An enrollment qualifies only when it is active and its newest event is `verified`; no event, or a newest `revoked` event, fails closed.
 - `student_channel_consent_events` records an `opt_in` or `opt_out` for one student, the fixed purpose `device_readiness_weekly`, and one channel. An opt-in records the notice-text version, how the learner expressed consent (`learner_self_service` or `learner_direct_request`), the actor who entered the record, and the event time. Do not store phone numbers, email addresses, or copies of identity documents in this log. The newest event for that exact student/purpose/channel tuple controls; the newest `opt_out` blocks that channel.
 
-Both tables use increasing event IDs so the latest state can be derived without overwriting history. The local schema enables row-level security, grants no access to `anon` or `authenticated`, and grants the backend `service_role` only `SELECT` and `INSERT`; it grants no update/delete permission. Keep the service-role secret on the server. There is no write API in this change. The existing shared `ADMIN_API_KEY` does not identify an individual staff member, so do not treat it as `recorded_by` or build a write route until authenticated actor identity and the approved learner-consent capture path are available. An opt-in must reflect the learner's own explicit choice, never an administrator's assumption.
+Both tables use increasing event IDs so the latest state can be derived without overwriting history. `recorded_by` is the UUID of the authenticated Supabase user, derived by the API rather than supplied by the caller. The local schema enables row-level security, grants no access to `anon` or `authenticated`, and grants the backend `service_role` only `SELECT` and `INSERT`; it grants no update/delete permission. Keep the service-role secret on the server.
 
-Student channel preference and fallback order are separate from consent and are not included in these records. Before any live weekly notice, the system must also check the learner's recorded preference, separate consent for each attempted channel, the paid/active enrollment gate, the 30-learner cap, and country/provider approval. This design does not wire a scheduler, provider, or send path and does not change Phase 1. Editing this schema file is not a live migration; no live database change or message is authorized.
+`app_user_profiles` maps each Supabase Auth user UUID to either `staff` or `learner` and, for a learner, to exactly one student row. The table is server-readable only; this backend has no sign-up, role-assignment, or profile-edit route. Profile mapping must be provisioned by a trusted operator after a separately authorized database setup. A missing profile fails closed.
 
-**Channel safeguards and open design:** each student must choose a preferred channel and rank any fallback channels; try them in the student's chosen order. Choosing or ranking a channel is not consent. Require a separate opt-in for this message purpose on every channel used, and do not send if the required preference and consent are missing. Attempt a fallback only after a provider-confirmed terminal failure on the current channel, and only if the learner has opted into the fallback; never bypass an opt-out. Pending or unknown delivery status is not failure and must not trigger fallback until reconciled, to avoid duplicates. Provider-specific failure mapping, retry/timeout limits, reconciliation timing, day/time, wording, locale, student-facing status of Telegram, email/SMS providers, country-specific requirements, student-preference capture, consent capture/authentication, deduplication, rate limits, costs, and support remain unresolved. The local schema defines append-only consent and payment events, but no write route or provider is implemented. Do not add providers/dependencies, alter the Phase 1 scheduler, migrate a live database, or send live messages until remaining details are documented and separately approved. This scope decision is not authorization for a real pilot or use of real learner data.
+For these online notice-recording routes only, the API validates each bearer access token with Supabase Auth `get_user(jwt)` and looks up the server-managed profile. Supabase documents `get_user(jwt)` as validating the JWT on the server ([Python reference](https://supabase.com/docs/reference/python/auth-getuser)). Staff may append payment verification/revocation events and may record a learner's direct consent request; learners may append consent events and preference snapshots only for the student account mapped to their verified identity. The route fixes the consent source, and derives `recorded_by` from the verified user. The shared `ADMIN_API_KEY` continues to protect existing Phase 1 operator routes and is never accepted as identity for Phase 2 events. Authentication or profile lookup failures fail closed. These routes require online Supabase Auth and do not implement offline classroom sign-in.
+
+The preferred/fallback order is stored separately in append-only `student_channel_preference_events` snapshots. Each snapshot stores the ordered canonical channel identifiers for the fixed `device_readiness_weekly` purpose; an empty array clears the learner's preference and means no channel is eligible. Preference never grants consent. A learner must opt in separately to every channel the sender may use; an opt-out blocks that channel. `GET /readiness/consent-notice?channel=...` returns the server-owned sample wording and fixed version `device-readiness-v1`; an opt-in event uses that server-owned version, not a client-supplied value. The current sample copy is not legal approval for any country; real consent capture requires country-appropriate notice review and a client that displays the exact version before the learner acts. Staff-entered consent is explicitly marked `learner_direct_request`; staff identity is still attributed.
+
+This change adds only local code/schema and synthetic tests. No login screen, real account, live schema migration, provider, scheduler, or send path is included. Before any live weekly notice, the sender must also check the learner's recorded preference, separate current consent for each attempted channel, the paid/active enrollment gate, the 30-learner cap, and country/provider approval. No live database change or message is authorized, and Phase 1 is unchanged.
+
+**Channel safeguards and open design:** each student must choose a preferred channel and rank any fallback channels; try them in the student's chosen order. Choosing or ranking a channel is not consent. Require a separate opt-in for this message purpose on every channel used, and do not send if the required preference and consent are missing. Attempt a fallback only after a provider-confirmed terminal failure on the current channel, and only if the learner has opted into the fallback; never bypass an opt-out. Pending or unknown delivery status is not failure and must not trigger fallback until reconciled, to avoid duplicates. Provider-specific failure mapping, retry/timeout limits, reconciliation timing, day/time, legally approved wording and locale, student-facing status of Telegram, email/SMS providers, country-specific requirements, trusted profile provisioning, a learner-facing sign-in/consent/preference interface, deduplication, rate limits, costs, and support remain unresolved. The local append-only schema and authenticated record-entry API exist, but no provider, scheduler, or send path is implemented. Do not add providers/dependencies, alter the Phase 1 scheduler, migrate a live database, or send live messages until remaining details are documented and separately approved. This scope decision is not authorization for a real pilot or use of real learner data.
 
 **Global reach research (checked 2026-09-28; providers not selected):** Treat “global” as the intended audience, not as proof every channel works in every country. Twilio's [international SMS guide](https://www.twilio.com/docs/messaging/guides/sending-international-sms-guide) says destination-country A2P rules and sender identities vary. Vonage's [country-specific SMS guide](https://developer.vonage.com/en/messaging/sms/guides/country-specific-features) and [delivery-receipt guide](https://developer.vonage.com/en/messaging/sms/guides/delivery-receipts) document country differences; an API acceptance means queued, and delivery receipts may not be available or conclusive in every market. For email, Amazon SES requires a plan for bounce/complaint handling and new accounts start in a restricted [sandbox](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html); its [sending-activity guidance](https://docs.aws.amazon.com/ses/latest/dg/monitor-sending-activity.html) distinguishes delivery, delay, bounce, and complaint events. These official docs support a per-country capability and cost review before enabling routes, not a blanket global claim. Ghana is the first market for readiness review; evaluate provider options only after the country checks below, and do not infer provider choice from this research.
 
@@ -306,6 +315,11 @@ daily_report.py -- compile report, send to administrator, expose via /reports/to
 | `/run-daily-job` | POST | Manually triggers the full daily flow |
 | `/webhooks/{channel}` | POST | Receives delivery-status callbacks from the provider; updates `reminder_log` |
 | `/reports/today` | GET | Returns today's engagement report as JSON |
+| `/readiness/consent-notice?channel=...` | GET | Returns versioned sample wording for the separate weekly-notice opt-in |
+| `/readiness/enrollments/{enrollment_id}/payment-events` | POST | Staff-only append of a manual payment verification/revocation event |
+| `/readiness/me/consent-events` | POST | Learner-only append of channel consent for their linked student account |
+| `/readiness/students/{student_id}/consent-events` | POST | Staff-only entry of a learner's direct consent request |
+| `/readiness/me/channel-preferences` | POST | Learner-only append of their preferred and fallback channel order |
 
 ---
 
@@ -314,6 +328,7 @@ daily_report.py -- compile report, send to administrator, expose via /reports/to
 `.env` (never committed; `.env.example` documents the shape with placeholder values only):
 ```
 SUPABASE_URL=
+# Server-only Supabase key with service_role access; never expose to a browser.
 SUPABASE_KEY=
 ACTIVE_CHANNEL=whatsapp
 BACKUP_CHANNEL=telegram

@@ -10,6 +10,7 @@ from fastapi import FastAPI
 
 from src.api.routes_health import router as health_router
 from src.api.routes_jobs import router as jobs_router
+from src.api.routes_readiness import router as readiness_router
 from src.api.routes_reports import router as reports_router
 from src.api.routes_webhooks import router as webhooks_router
 from src.config import get_settings
@@ -46,5 +47,6 @@ app = FastAPI(title="Global Learning Hub Automation", lifespan=lifespan)
 
 app.include_router(health_router)
 app.include_router(jobs_router)
+app.include_router(readiness_router)
 app.include_router(reports_router)
 app.include_router(webhooks_router)

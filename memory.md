@@ -150,3 +150,11 @@
 **What was decided:** For the Phase 2 weekly notice, track payment verification/revocation per enrollment and opt-in/opt-out per learner, purpose, and channel in separate append-only event logs. The latest event controls current state; require an active enrollment, latest payment verification, and a current opt-in for each attempted channel. Keep these changes local until separately authorized migration; do not add a write endpoint until actor identity and learner consent capture are safe.
 **Why:** Separate histories preserve auditability and withdrawals without treating payment or channel preference as consent.
 **What was rejected:** One mutable paid flag, global consent, or inferring payment/consent from active enrollment.
+
+## 2026-09-29, Use Supabase Auth identities for local Phase 2 notice recording
+
+**What was decided:** For weekly device-readiness records only, locally implement server-verified Supabase Auth identities mapped to staff or one learner/student. Staff can verify/revoke payment and enter a learner's direct consent request; learners can update consent and an append-only ordered channel-preference snapshot only for their mapped student. The API derives actor/source and fails closed. An empty channel-order snapshot means no preference and never grants consent.
+**Consent copy:** The API serves fixed sample version `device-readiness-v1` and assigns it to opt-ins rather than trusting a client-supplied version. This wording is not legal approval; review it for each market before real consent capture or sending.
+**Why:** The shared operator API key cannot safely attribute actions to a person, and request-supplied student IDs could let a learner modify someone else's records.
+**What was rejected:** Using the shared key as an audit actor, letting clients supply actor IDs, combining preference with consent, or treating online notice authentication as offline class-platform sign-in.
+**Boundary:** Build/test with fake accounts locally only. No sign-up, role-management endpoint, login UI, live migration, real data, attendance API, message provider, send, push, or deployment is authorized. The memory CLI is unavailable in this PowerShell environment; continue maintaining this repository `memory.md`.

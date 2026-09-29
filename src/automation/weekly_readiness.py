@@ -34,7 +34,13 @@ def _same_id(value: object, expected: object) -> bool:
 
 def _has_actor(event: Mapping[str, object]) -> bool:
     actor = event.get("recorded_by")
-    return isinstance(actor, str) and bool(actor.strip())
+    if not isinstance(actor, str):
+        return False
+    try:
+        UUID(actor)
+    except ValueError:
+        return False
+    return True
 
 
 def eligible_for_weekly_readiness_channel(

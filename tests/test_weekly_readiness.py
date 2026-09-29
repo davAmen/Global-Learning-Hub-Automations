@@ -4,6 +4,7 @@ from src.automation.weekly_readiness import eligible_for_weekly_readiness_channe
 
 ENROLLMENT_ID = "enrollment-1"
 STUDENT_ID = "student-1"
+STAFF_ID = "00000000-0000-4000-8000-000000000001"
 
 
 def payment_event(event_id: int, action: str, enrollment_id: str = ENROLLMENT_ID) -> dict:
@@ -11,7 +12,7 @@ def payment_event(event_id: int, action: str, enrollment_id: str = ENROLLMENT_ID
         "id": event_id,
         "enrollment_id": enrollment_id,
         "action": action,
-        "recorded_by": "staff-1",
+        "recorded_by": STAFF_ID,
     }
 
 
@@ -31,7 +32,7 @@ def consent_event(
         "action": action,
         "consent_version": "weekly-readiness-v1" if action == "opt_in" else None,
         "source": "learner_direct_request",
-        "recorded_by": "staff-1",
+        "recorded_by": STAFF_ID,
     }
 
 
