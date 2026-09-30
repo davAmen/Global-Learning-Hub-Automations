@@ -179,3 +179,10 @@
 **What was found:** The Next.js frontend exists in the sibling local `main` worktree, which is seven commits ahead of the configured local `origin`; it is absent from the Phase 2 branch and from GitHub's canonical repository `main`. That local branch also restructures the backend under `backend/` and differs by many backend/docs files, so merging it wholesale would risk losing Phase 2 work.
 **Integration blockers:** The frontend expects `students` and `courses` arrays that the current report API does not return. It calls admin-protected endpoints without authentication; putting `ADMIN_API_KEY` in browser-visible configuration would expose it. Do not copy/merge/deploy the UI until the exact files and a safe admin-auth approach are agreed.
 **What was rejected:** Merging all of local `main` just to retrieve the frontend, or exposing the shared admin key to browser JavaScript.
+
+## 2026-09-30, Design staff sign-in before implementation
+
+**What was decided:** The user chose to design the staff sign-in flow first. This is design-only approval; no frontend/backend auth changes, dependency installation, live schema change, external account setup, push, or deployment is approved yet.
+**Proposed direction, pending review:** Use Supabase Auth for pre-created staff identities, a same-origin Next.js server route to relay authenticated requests, and backend verification of the Supabase identity plus the existing staff role mapping. Never expose the shared admin key or Supabase server secret in browser code. Confirm compatibility with the repo's Next.js version and the current Supabase SSR package status before implementation.
+**Why:** Existing dashboard calls are unauthenticated, while the API requires a shared admin key; sending that key from the browser would disclose it.
+**What was rejected:** Treating the proposed technical design as already approved, putting a long-lived admin credential in frontend configuration, or making public staff sign-up/role assignment.
