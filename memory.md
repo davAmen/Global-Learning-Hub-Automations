@@ -173,3 +173,9 @@
 **What was decided:** WhatsApp is the only Phase 1 learner-reminder channel. The configured Telegram chat belongs to the administrator and is used only for reports; reject any attempt to send a learner-specific reminder there. Treat timeouts, server errors, or provider responses without a message ID as unknown/pending, never as permission to retry or fall back.
 **Why:** The system must not expose a learner's private reminder to the administrator or create duplicates after uncertain delivery.
 **What was rejected:** Telegram as an assumed learner backup, and treating a failed network response as proof the provider did not accept the message.
+
+## 2026-09-30, Frontend is on a divergent local branch
+
+**What was found:** The Next.js frontend exists in the sibling local `main` worktree, which is seven commits ahead of the configured local `origin`; it is absent from the Phase 2 branch and from GitHub's canonical repository `main`. That local branch also restructures the backend under `backend/` and differs by many backend/docs files, so merging it wholesale would risk losing Phase 2 work.
+**Integration blockers:** The frontend expects `students` and `courses` arrays that the current report API does not return. It calls admin-protected endpoints without authentication; putting `ADMIN_API_KEY` in browser-visible configuration would expose it. Do not copy/merge/deploy the UI until the exact files and a safe admin-auth approach are agreed.
+**What was rejected:** Merging all of local `main` just to retrieve the frontend, or exposing the shared admin key to browser JavaScript.
