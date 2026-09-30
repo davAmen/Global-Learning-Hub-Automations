@@ -1,5 +1,5 @@
 # ARCHITECTURE.md
-> The Phase 1 implementation below remains current. `PLATFORM_BRIEF.md` records the approved product expansion, and `MASTER_PROMPT.md` sequences it with the operator's additional attendance, classroom-agent, marketing, and partnership goals. This roadmap does not itself activate later-phase implementation. New tables, providers, frontend locations, and public endpoints require documented designs before code is changed; deployment, live database migrations, and other external actions require separate approval.
+> Phase 1 is the implemented daily reminder service. Phase 2 currently has local-only payment, consent, and preference recording routes for its separate weekly readiness notice; the offline classroom platform and attendance system remain design-only. `PLATFORM_BRIEF.md` records the approved product expansion, and `MASTER_PROMPT.md` sequences later goals. New tables, providers, frontend locations, and public endpoints require documented designs before code is changed; deployment, live database migrations, and other external actions require separate approval.
 ### Student Engagement & Reminder Automation -- Global Learning Hub, Phase 1
 
 This is the technical specification for this repository. Any code written must conform to this structure. If a change requires deviating from it, that deviation must be discussed and this document updated first -- do not silently drift from it.
@@ -15,7 +15,7 @@ This is the technical specification for this repository. Any code written must c
 | Database | Supabase (Postgres) -- the ONLY data store. No Google Sheets, no local files, no second source of truth. |
 | Scheduling | APScheduler running inside the FastAPI app, or a hosted cron service calling `POST /run-daily-job` |
 | Primary delivery | WhatsApp Business Cloud API (Meta) |
-| Backup delivery | Telegram Bot API (operator's own channel @DavidAmenuku20) |
+| Administrator report delivery | Telegram Bot API (operator's own administrator chat) |
 | Other channels | Email and SMS adapters exist in code but are NOT wired/active in Phase 1 |
 
 ---
@@ -53,7 +53,7 @@ global-learning-hub-automation/
       __init__.py
       base.py                   # abstract Channel interface -- all channels implement this
       whatsapp_channel.py       # ACTIVE (Meta Business Cloud API)
-      telegram_channel.py       # BACKUP (Bot API, operator's @DavidAmenuku20)
+      telegram_channel.py       # administrator reports only; not a student fallback
       email_channel.py          # NOT WIRED in Phase 1
       sms_channel.py            # NOT WIRED in Phase 1
 
@@ -152,9 +152,11 @@ create table if not exists engagement_log (
   id                   uuid primary key default gen_random_uuid(),
   enrollment_id        uuid not null references enrollments(id),
   date                 date not null,
-  status               text not null default 'active',
+  status               text not null default 'active'
+                       check (status in ('active', 'low_engagement', 'needs_followup')),
   assignment_submitted boolean not null default false,
-  updated_at           timestamptz not null default now()
+  updated_at           timestamptz not null default now(),
+  unique (enrollment_id, date)
 );
 
 -- reminder_log
@@ -163,10 +165,13 @@ create table if not exists reminder_log (
   enrollment_id   uuid references enrollments(id),
   channel         text not null,
   message         text,
+  idempotency_key text unique,
   sent_at         timestamptz not null default now(),
   delivery_status text not null default 'pending'
 );
 ```
+
+The `engagement_log` unique key is required by the daily upsert conflict target. For every new send, the application writes a deterministic `idempotency_key` before contacting a provider: one key per enrollment and scheduled date for a learner reminder, and one key per report date for the administrator report. The unique constraint is the cross-process duplicate guard; a pre-send lookup alone is not atomic. Existing rows may have a null key, but all new application send attempts must include one. If a key already exists, do not send again. An unfinalized `pending` row remains visible for human review and is not automatically retried.
 
 Do not add new tables or columns without updating this file first.
 
@@ -206,7 +211,7 @@ For the first synthetic-data pilot, test: (1) download approved class resources,
 
 **Device direction confirmed by the operator (2026-09-27):** learners should use devices they own rather than relying on a shared classroom device. Treat this as a BYOD preference, not a decision about phones versus tablets/computers, native app versus browser, or an assumption that every learner has a suitable, charged device. Device support and a fallback for learners without access remain to be planned; this does not authorize a pilot.
 
-**Device-readiness policy confirmed by the operator (2026-09-27):** send one weekly reminder for learners to charge their own devices for class, and use a school-provided device where one is available. The operator explicitly expanded the Phase 2 scope on 2026-09-27: the notice should reach learners across approved student-facing channels, including WhatsApp, email, SMS, and future approved channels. This is a separate addition; do not alter the Phase 1 daily reminder's WhatsApp active channel or Telegram backup.
+**Device-readiness policy confirmed by the operator (2026-09-27):** send one weekly reminder for learners to charge their own devices for class, and use a school-provided device where one is available. The operator explicitly expanded the Phase 2 scope on 2026-09-27: the notice should reach learners across approved student-facing channels, including WhatsApp, email, SMS, and future approved channels. This is a separate addition; preserve the Phase 1 WhatsApp learner-reminder channel. Telegram currently delivers administrator reports only and is not a student fallback because its configured destination is the administrator's chat.
 
 **First-cohort eligibility request (2026-09-28):** The operator set an initial cohort target of no more than 30 learners, limited to learners with verified payment for a course. This applies only to the separate Phase 2 weekly device-readiness notice, not the Phase 1 daily reminders. Payment is never a substitute for separate purpose- and channel-specific opt-in. The local schema below now defines the payment and consent event records; do not infer either from `enrollments.status = active`. Manual administrator verification was selected for the first cohort; do not add a checkout provider. These definitions have not been applied to live Supabase. Until a controlled-pilot authorization and a secure, attributable record-entry process exist, use synthetic data and do not send live messages.
 
@@ -245,7 +250,9 @@ This change adds only local code/schema and synthetic tests. No login screen, re
 
 **No-cost pilot option (research recommendation, not an integration decision):** The WhatsApp Business App is free to download and can be used for manual, private one-to-one messages to a small, opted-in cohort; this avoids Business Platform API message fees but is not automated by this program and still requires staff time and internet/data access. Meta's Business Broadcasts feature is limited to eligible users in selected countries, so Ghana availability must be confirmed before relying on it. Do not automate WhatsApp Web. For local software tests, a mocked/no-send channel is the free and safe option. The WhatsApp Business Platform charges per delivered message by market and category; service messages and utility messages sent in response to a user are free, but a proactive weekly notice should be treated as potentially billable and use approved templates when required. See [WhatsApp Business App information](https://faq.whatsapp.com/641572844337957), [Business Broadcast feature availability](https://whatsappbusiness.com/products/business-app-features/), [Platform pricing](https://whatsappbusiness.com/products/platform-pricing/), and the [Business Messaging Policy](https://whatsappbusiness.com/policy/?lang=en_US).
 
-**Existing WhatsApp code check:** `src/channels/whatsapp_channel.py` currently builds a plain `type: text` request. Meta's current [Business Messaging Policy](https://whatsappbusiness.com/policy/?lang=en_US) says business-initiated conversations must use approved templates, and plain replies are permitted only within the 24-hour service window. Therefore the existing sender has not been shown compliant for scheduled outbound reminders outside that window. Resolve and test template handling before any live scheduled send; this review did not modify the code or authorize a send.
+**WhatsApp send gate:** scheduled reminders are business-initiated messages. Meta's current [Business Messaging Policy](https://whatsappbusiness.com/policy/) requires an approved template to initiate a conversation and permits free-form replies only inside the 24-hour customer-service window. The scheduler has no verified record of each learner's last inbound message, so the adapter must use a configured approved template and must never fall back to free-form text. The supported Graph API version, approved template name/language, and template approval must be configured and checked before any live send. The local adapter tests only a mocked request; no real template, recipient, credential, or send is authorized.
+
+**Telegram destination limit:** `TELEGRAM_ADMIN_CHAT_ID` is an administrator-report destination, not an individual learner address. Do not use it to send student-specific reminder text. Telegram is not an operational learner fallback until a separately approved, privacy-safe recipient model exists; a WhatsApp failure must remain visible rather than silently routing a student's named reminder to the administrator.
 
 **Recommended rollout:** retain a country-by-country approval matrix for each channel (coverage, sender/number registration, provider price, required consent, delivery-status quality, and operational support). Start with Ghana, then add countries after review. Keep the existing Phase 1 WhatsApp daily reminder flow untouched. A route with unverified coverage or unclear delivery state is unavailable for automatic fallback.
 
@@ -275,12 +282,12 @@ These steps describe approved product direction, not a selected database, API, a
 ```python
 # channels/base.py
 class Channel:
-    def send(self, student, message: str) -> bool:
-        """Send a message. Return True if sent, False if failed."""
+    def send(self, student, message: str) -> bool | None:
+        """Return True if provider accepted, False if definitely rejected, or None if unknown."""
         raise NotImplementedError
 ```
 
-Every channel implementation (`whatsapp_channel.py`, `telegram_channel.py`, `email_channel.py`, `sms_channel.py`) must implement this exact interface. `scheduler.py` calls only `channel.send(student, message)` -- it must never contain channel-specific logic (no `if channel == "sms"` branching inside the scheduler). The active channel is selected once, in `config.py`, via `ACTIVE_CHANNEL`. The backup is `BACKUP_CHANNEL`.
+Every channel implementation (`whatsapp_channel.py`, `telegram_channel.py`, `email_channel.py`, `sms_channel.py`) must implement this interface. A `True` result means the provider acknowledged acceptance, not confirmed recipient delivery; `False` means definite rejection or no attempt; `None` means the outcome is unknown and must remain pending for human review. Do not retry or switch channels automatically on an unknown outcome. The daily student reminder uses WhatsApp only. Telegram is currently an administrator-report destination, not a safe student fallback. `scheduler.py` calls only `channel.send(student, message)` -- it must never contain channel-specific logic (no `if channel == "sms"` branching inside the scheduler).
 
 ---
 
@@ -312,7 +319,7 @@ daily_report.py -- compile report, send to administrator, expose via /reports/to
 | Endpoint | Method | Purpose |
 |---|---|---|
 | `/health` | GET | Uptime check |
-| `/run-daily-job` | POST | Manually triggers the full daily flow |
+| `/run-daily-job` | POST | Manually triggers reminders and the daily administrator report |
 | `/webhooks/{channel}` | POST | Receives delivery-status callbacks from the provider; updates `reminder_log` |
 | `/reports/today` | GET | Returns today's engagement report as JSON |
 | `/readiness/consent-notice?channel=...` | GET | Returns versioned sample wording for the separate weekly-notice opt-in |
@@ -331,10 +338,13 @@ SUPABASE_URL=
 # Server-only Supabase key with service_role access; never expose to a browser.
 SUPABASE_KEY=
 ACTIVE_CHANNEL=whatsapp
-BACKUP_CHANNEL=telegram
+BACKUP_CHANNEL=telegram  # legacy setting name; administrator reports only
 
 WHATSAPP_TOKEN=
 WHATSAPP_PHONE_ID=
+WHATSAPP_API_VERSION=       # currently supported Meta Graph API version
+WHATSAPP_TEMPLATE_NAME=     # approved template with one body text parameter
+WHATSAPP_TEMPLATE_LANGUAGE=en_US
 
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_ADMIN_CHAT_ID=
@@ -346,6 +356,8 @@ ADMIN_PHONE=
 RATE_LIMIT_DELAY_SECONDS=60
 JOB_HOUR=8
 ```
+
+One run captures a single host-local calendar date and passes it through reminder and report processing so a long run cannot split across two report dates. The host timezone is not yet an approved per-course timezone policy; settle that before worldwide scheduled use.
 
 ---
 

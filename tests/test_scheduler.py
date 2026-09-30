@@ -54,3 +54,6 @@ def test_send_reminders_uses_logged_attempt_and_updates_engagement():
     update_engagement.assert_called_once_with(db, "enrollment-1", date(2026, 9, 18))
     assert send_and_log.call_args.args[0:3] == (db, channel, student)
     assert send_and_log.call_args.args[4] == "enrollment-1"
+    assert send_and_log.call_args.kwargs["idempotency_key"] == (
+        "student-reminder:enrollment-1:2026-09-18"
+    )

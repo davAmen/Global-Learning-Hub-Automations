@@ -17,11 +17,14 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     admin_api_key: str = ""
 
-    active_channel: Literal["whatsapp", "telegram"] = "whatsapp"
-    backup_channel: Literal["whatsapp", "telegram"] = "telegram"
+    active_channel: Literal["whatsapp"] = "whatsapp"
+    backup_channel: Literal["telegram"] = "telegram"
 
     whatsapp_token: str = ""
     whatsapp_phone_id: str = ""
+    whatsapp_api_version: str = ""
+    whatsapp_template_name: str = ""
+    whatsapp_template_language: str = "en_US"
 
     telegram_bot_token: str = ""
     telegram_admin_chat_id: str = ""

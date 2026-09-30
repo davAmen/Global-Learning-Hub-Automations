@@ -32,6 +32,8 @@ def test_build_report_excludes_administrator_attempts_from_student_totals():
                     {"enrollment_id": "enrollment-1", "delivery_status": "sent"},
                     {"enrollment_id": None, "delivery_status": "sent"},
                     {"enrollment_id": "enrollment-2", "delivery_status": "failed"},
+                    {"enrollment_id": "enrollment-3", "delivery_status": "pending"},
+                    {"enrollment_id": "enrollment-4", "delivery_status": "unexpected"},
                 ]
             )
         return query
@@ -43,7 +45,7 @@ def test_build_report_excludes_administrator_attempts_from_student_totals():
     assert report["courses_today"] == 1
     assert report["total_enrolled"] == 1
     assert report["engagement"]["active"] == 1
-    assert report["reminders"] == {"sent": 1, "failed": 1}
+    assert report["reminders"] == {"sent": 1, "failed": 1, "pending": 2}
     upper_bound = (
         queries["reminder_log"]
         .select.return_value.gte.return_value.lt.call_args.args[1]
@@ -59,7 +61,7 @@ def test_send_report_logs_attempt_through_configured_backup():
         "courses_today": 1,
         "total_enrolled": 1,
         "engagement": {"active": 1, "low_engagement": 0, "needs_followup": 0},
-        "reminders": {"sent": 1, "failed": 0},
+        "reminders": {"sent": 1, "failed": 0, "pending": 0},
     }
     settings = SimpleNamespace(backup_channel="telegram")
     db = MagicMock()
@@ -77,8 +79,12 @@ def test_send_report_logs_attempt_through_configured_backup():
     args = send_and_log.call_args.args
     assert args[:3] == (db, channel, None)
     assert args[4] is None
-    assert "Reminders sent: 1" in args[3]
+    assert "Reminders accepted by provider: 1" in args[3]
     assert "Reminders failed: 0" in args[3]
+    assert "Reminders pending/unknown: 0" in args[3]
+    assert send_and_log.call_args.kwargs["idempotency_key"] == (
+        "administrator-report:2026-09-26"
+    )
 
 
 def test_send_report_skips_a_second_attempt_on_the_same_day():

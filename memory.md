@@ -158,3 +158,18 @@
 **Why:** The shared operator API key cannot safely attribute actions to a person, and request-supplied student IDs could let a learner modify someone else's records.
 **What was rejected:** Using the shared key as an audit actor, letting clients supply actor IDs, combining preference with consent, or treating online notice authentication as offline class-platform sign-in.
 **Boundary:** Build/test with fake accounts locally only. No sign-up, role-management endpoint, login UI, live migration, real data, attendance API, message provider, send, push, or deployment is authorized. The memory CLI is unavailable in this PowerShell environment; continue maintaining this repository `memory.md`.
+
+## 2026-09-30, Harden Phase 1 job idempotency and safe messaging
+
+**What was decided:** Require a database unique constraint for daily engagement upserts and a deterministic unique send key per learner/enrollment/date or administrator-report/date, written before provider calls. Do not send on key conflicts or log-write failures; expose uncertain `pending` outcomes in the report. The manual run route must also build and send the administrator report.
+**Why:** A process-local lock and check-before-send query do not prevent concurrent workers from racing, and the current report hides pending outcomes.
+**What was rejected:** Assuming one server process forever, retrying an uncertain delivery automatically, or treating HTTP acceptance as proof of final delivery.
+
+**WhatsApp safeguard:** Scheduled reminders must use a configured approved template and an explicitly configured supported Graph API version; free-form text is unsafe because the scheduler cannot verify the recipient's 24-hour window. Do not send a student-specific reminder to the administrator's Telegram chat.
+**Boundary:** Implement only local schema/code/tests. No live migration, provider account/API call, recipient send, push, or deploy. The currently observed Git `origin` is a local Desktop path rather than the selected GitHub repository, so do not push to it.
+
+## 2026-09-30, Keep learner and administrator delivery separated
+
+**What was decided:** WhatsApp is the only Phase 1 learner-reminder channel. The configured Telegram chat belongs to the administrator and is used only for reports; reject any attempt to send a learner-specific reminder there. Treat timeouts, server errors, or provider responses without a message ID as unknown/pending, never as permission to retry or fall back.
+**Why:** The system must not expose a learner's private reminder to the administrator or create duplicates after uncertain delivery.
+**What was rejected:** Telegram as an assumed learner backup, and treating a failed network response as proof the provider did not accept the message.

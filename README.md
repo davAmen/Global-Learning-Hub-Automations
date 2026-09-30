@@ -17,7 +17,7 @@ The current code is the reminder service, not a deployed course marketplace.
    (currently `whatsapp`).
 3. It logs every send to `reminder_log` and to a log file.
 4. It marks students as `active` / `low_engagement` / `needs_followup`.
-5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled runs.
+5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled and manual runs. The report distinguishes provider-accepted, failed, and pending/unknown attempts; provider acceptance is not proof that the recipient received the message.
 
 ## Stack
 
@@ -53,5 +53,10 @@ provider payload verification and provider-message-ID mapping are built.
 | `/run-daily-job` | POST | Manually triggers the full daily flow |
 | `/webhooks/{channel}` | POST | Receives delivery-status callbacks |
 | `/reports/today` | GET | Today's engagement report as JSON |
+| `/readiness/consent-notice?channel=...` | GET | Sample copy for the separate Phase 2 weekly device-readiness notice |
+| `/readiness/enrollments/{enrollment_id}/payment-events` | POST | Staff-authenticated payment verification/revocation record |
+| `/readiness/me/consent-events` | POST | Learner-authenticated consent for their linked account |
+| `/readiness/students/{student_id}/consent-events` | POST | Staff entry of a learner's direct consent request |
+| `/readiness/me/channel-preferences` | POST | Learner-authenticated preferred/fallback channel order |
 
 See `docs/ARCHITECTURE.md` for the full specification.

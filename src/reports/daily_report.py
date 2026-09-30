@@ -26,6 +26,7 @@ def build_report(db, on_date: date | None = None) -> dict:
     total_followup = 0
     total_sent = 0
     total_failed = 0
+    total_pending = 0
 
     for course in courses:
         enr = db.table("enrollments").select("id, status").eq("course_id", course["id"]).execute()
@@ -64,13 +65,20 @@ def build_report(db, on_date: date | None = None) -> dict:
             total_sent += 1
         elif r["delivery_status"] == "failed":
             total_failed += 1
+        else:
+            # Includes pending attempts and unexpected statuses; never hide uncertainty.
+            total_pending += 1
 
     return {
         "date": on_date.isoformat(),
         "courses_today": len(courses),
         "total_enrolled": total_enrolled,
         "engagement": {"active": total_active, "low_engagement": total_low, "needs_followup": total_followup},
-        "reminders": {"sent": total_sent, "failed": total_failed},
+        "reminders": {
+            "sent": total_sent,
+            "failed": total_failed,
+            "pending": total_pending,
+        },
     }
 
 
@@ -112,10 +120,18 @@ def send_report_to_admin(
             f"{report['engagement']['low_engagement']} low engagement, "
             f"{report['engagement']['needs_followup']} need follow-up"
         ),
-        f"Reminders sent: {report['reminders']['sent']}",
+        f"Reminders accepted by provider: {report['reminders']['sent']}",
         f"Reminders failed: {report['reminders']['failed']}",
+        f"Reminders pending/unknown: {report['reminders'].get('pending', 0)}",
     ]
     body = "\n".join(lines)
 
     channel = get_channel(channel_name)
-    return send_and_log(db, channel, None, body, None)
+    return send_and_log(
+        db,
+        channel,
+        None,
+        body,
+        None,
+        idempotency_key=f"administrator-report:{report_date.isoformat()}",
+    )

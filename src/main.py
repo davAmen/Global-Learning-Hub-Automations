@@ -4,6 +4,7 @@ Sets up routes and APScheduler for the daily job.
 """
 
 from contextlib import asynccontextmanager
+from datetime import date
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
@@ -28,8 +29,9 @@ def run_scheduled_job():
 
     logger.info("Scheduled job firing.")
     db = get_db()
-    send_reminders(db)
-    send_report_to_admin(build_report(db))
+    run_date = date.today()
+    send_reminders(db, run_date)
+    send_report_to_admin(build_report(db, run_date), db=db)
 
 
 @asynccontextmanager

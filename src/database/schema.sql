@@ -30,9 +30,11 @@ create table if not exists engagement_log (
   id                   uuid primary key default gen_random_uuid(),
   enrollment_id        uuid not null references enrollments(id),
   date                 date not null,
-  status               text not null default 'active',
+  status               text not null default 'active'
+                       check (status in ('active', 'low_engagement', 'needs_followup')),
   assignment_submitted boolean not null default false,
-  updated_at           timestamptz not null default now()
+  updated_at           timestamptz not null default now(),
+  unique (enrollment_id, date)
 );
 
 -- reminder_log
@@ -41,6 +43,7 @@ create table if not exists reminder_log (
   enrollment_id   uuid references enrollments(id),
   channel         text not null,
   message         text,
+  idempotency_key text unique,
   sent_at         timestamptz not null default now(),
   delivery_status text not null default 'pending'
 );
