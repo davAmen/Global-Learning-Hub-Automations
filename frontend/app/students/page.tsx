@@ -8,7 +8,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/today`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/students`)
       .then((r) => r.json())
       .then((data) => setStudents(data.students || []))
       .catch(() => setStudents([]))

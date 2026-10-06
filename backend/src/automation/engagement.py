@@ -42,13 +42,30 @@ def days_since_last_submission(db, enrollment_id, reference: date | None = None)
 def update_engagement(db, enrollment_id, reference: date | None = None) -> str:
     reference = reference or date.today()
     status = classify(days_since_last_submission(db, enrollment_id, reference))
-    db.table("engagement_log").upsert(
-        {
-            "enrollment_id": str(enrollment_id),
-            "date": reference.isoformat(),
-            "status": status,
-            "assignment_submitted": status == "active",
-        },
-        on_conflict="enrollment_id,date",
-    ).execute()
+
+    # Check if record exists for today
+    existing = (
+        db.table("engagement_log")
+        .select("id")
+        .eq("enrollment_id", str(enrollment_id))
+        .eq("date", reference.isoformat())
+        .limit(1)
+        .execute()
+    )
+
+    data = {
+        "enrollment_id": str(enrollment_id),
+        "date": reference.isoformat(),
+        "status": status,
+        "assignment_submitted": status == "active",
+        "updated_at": date.today().isoformat(),
+    }
+
+    if existing.data:
+        # Update existing record
+        db.table("engagement_log").update(data).eq("id", existing.data[0]["id"]).execute()
+    else:
+        # Insert new record
+        db.table("engagement_log").insert(data).execute()
+
     return status

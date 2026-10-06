@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     active_channel: Literal["whatsapp", "telegram", "email", "sms"] = "whatsapp"
     backup_channel: Literal["whatsapp", "telegram", "email", "sms"] = "telegram"
 
-    whatsapp_token: str = ""
-    whatsapp_phone_id: str = ""
+    wasender_api_key: str = ""
+    wasender_base_url: str = "https://www.wasenderapi.com"
 
     telegram_bot_token: str = ""
     telegram_admin_chat_id: str = ""

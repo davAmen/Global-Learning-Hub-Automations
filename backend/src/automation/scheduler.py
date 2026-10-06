@@ -68,13 +68,14 @@ def get_student(db, student_id):
     return None
 
 
-def build_reminder_queue(db, on_date: date | None = None) -> list[Enrollment]:
+def build_reminder_queue(db, on_date: date | None = None) -> list[tuple[Enrollment, Course]]:
+    """Returns list of (enrollment, course) tuples for courses today."""
     on_date = on_date or date.today()
-    queue: list[Enrollment] = []
+    queue: list[tuple[Enrollment, Course]] = []
     for course in classes_today(db, on_date):
         for enrollment in active_enrollments(db, course.id):
             if not already_sent(db, enrollment.id, on_date):
-                queue.append(enrollment)
+                queue.append((enrollment, course))
     return queue
 
 
@@ -82,35 +83,40 @@ def send_reminders(db, on_date: date | None = None) -> int:
     """Run the full daily flow: query queue, send, log. Returns count sent."""
     from src.channels.base import get_channel
     from src.automation.reminder_templates import reminder_for
-    from src.automation.engagement import classify, days_since_last_submission
+    from src.automation.engagement import classify, days_since_last_submission, update_engagement
 
     settings = get_settings()
     channel = get_channel(settings.active_channel)
     queue = build_reminder_queue(db, on_date)
     sent = 0
 
-    for enrollment in queue:
+    for enrollment, course in queue:
         student = get_student(db, enrollment.student_id)
         if not student:
             logger.warning(f"No student found for enrollment {enrollment.id}")
             continue
 
+        # Update engagement status for this enrollment
+        engagement_status = update_engagement(db, enrollment.id, on_date)
+
         pending = days_since_last_submission(db, enrollment.id, on_date)
         status = classify(pending)
 
-        resp = db.table("courses").select("name, class_time").eq("id", str(enrollment.course_id)).limit(1).execute()
-        course_name = resp.data[0]["name"] if resp.data else "your course"
-        class_time = resp.data[0]["class_time"] if resp.data else "TBD"
+        course_name = course.name
+        class_time = course.class_time or "TBD"
 
         tmpl = reminder_for(student.name, course_name, class_time, status)
-        ok = channel.send(student, tmpl.body)
+        ok, external_msg_id = channel.send(student, tmpl.body)
 
-        db.table("reminder_log").insert({
+        insert_data = {
             "enrollment_id": str(enrollment.id),
             "channel": channel.name,
             "message": tmpl.body,
             "delivery_status": "sent" if ok else "failed",
-        }).execute()
+        }
+        if external_msg_id:
+            insert_data["external_message_id"] = external_msg_id
+        db.table("reminder_log").insert(insert_data).execute()
 
         if ok:
             sent += 1

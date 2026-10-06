@@ -12,6 +12,11 @@ from src.api.routes_health import router as health_router
 from src.api.routes_jobs import router as jobs_router
 from src.api.routes_reports import router as reports_router
 from src.api.routes_webhooks import router as webhooks_router
+from src.api.routes_students import router as students_router
+from src.api.routes_courses import router as courses_router
+from src.api.routes_approvals import router as approvals_router
+from src.api.routes_payments import router as payments_router
+from src.api.routes_groups import router as groups_router
 from src.config import get_settings
 from src.utils.logger import get_logger
 
@@ -46,3 +51,8 @@ app.include_router(health_router)
 app.include_router(jobs_router)
 app.include_router(reports_router)
 app.include_router(webhooks_router)
+app.include_router(students_router)
+app.include_router(courses_router)
+app.include_router(approvals_router)
+app.include_router(payments_router)
+app.include_router(groups_router)

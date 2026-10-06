@@ -1,6 +1,6 @@
 """WhatsApp channel - Phase 1 ACTIVE.
 
-Uses the WhatsApp Business Cloud API (Meta).
+Uses the WasenderAPI (wasenderapi.com).
 All credentials come from the environment - never hardcoded.
 """
 
@@ -18,31 +18,34 @@ logger = get_logger(__name__)
 class WhatsAppChannel(Channel):
     name = "whatsapp"
 
-    def send(self, student, message: str) -> bool:
+    def send(self, student, message: str) -> tuple[bool, str | None]:
+        """Send a message. Returns (success, external_message_id)."""
         settings = get_settings()
-        if not (settings.whatsapp_token and settings.whatsapp_phone_id):
-            logger.error("WhatsApp not configured.")
-            return False
+        if not settings.wasender_api_key:
+            logger.error("WasenderAPI not configured (missing WASENDER_API_KEY).")
+            return False, None
 
-        url = f"https://graph.facebook.com/v21.0/{settings.whatsapp_phone_id}/messages"
+        url = f"{settings.wasender_base_url}/api/send-message"
         headers = {
-            "Authorization": f"Bearer {settings.whatsapp_token}",
+            "Authorization": f"Bearer {settings.wasender_api_key}",
             "Content-Type": "application/json",
         }
-        to_number = student.phone.lstrip("+")
+        to_number = student.phone.strip()
+        if not to_number.startswith("+"):
+            to_number = "+" + to_number.lstrip("+")
         payload = {
-            "messaging_product": "whatsapp",
             "to": to_number,
-            "type": "text",
-            "text": {"preview_url": False, "body": message},
+            "text": message,
         }
         try:
             r = httpx.post(url, headers=headers, json=payload, timeout=15)
             if r.status_code != 200:
-                logger.error(f"WhatsApp API error {r.status_code}: {r.text}")
+                logger.error(f"WasenderAPI error {r.status_code}: {r.text}")
             r.raise_for_status()
-            logger.info(f"WhatsApp sent to {student.phone}")
-            return True
+            data = r.json()
+            external_msg_id = str(data.get("data", {}).get("msgId")) if data.get("success") else None
+            logger.info(f"WasenderAPI sent to {student.phone}, msg_id={external_msg_id}")
+            return True, external_msg_id
         except httpx.HTTPError as exc:
-            logger.error(f"WhatsApp send failed for {student.phone}: {exc}")
-            return False
+            logger.error(f"WasenderAPI send failed for {student.phone}: {exc}")
+            return False, None

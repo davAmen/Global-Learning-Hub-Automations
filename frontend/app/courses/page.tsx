@@ -3,25 +3,28 @@
 import { useEffect, useState } from "react";
 
 export default function CoursesPage() {
-  const [report, setReport] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/today`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/courses`)
       .then((r) => r.json())
-      .then(setReport)
-      .catch(() => setReport(null))
+      .then((data) => setCourses(data.courses || []))
+      .catch(() => setCourses([]))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (!report) return <p>Could not load course data.</p>;
 
   return (
     <div>
       <h1>Courses</h1>
-      <p>Courses today: {report.courses_today}</p>
-      <p>Total enrolled: {report.total_enrolled}</p>
+      {courses.map((c, i) => (
+        <div key={i} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
+          <h3>{c.name}</h3>
+          <p>Start: {c.start_date} at {c.class_time}</p>
+        </div>
+      ))}
     </div>
   );
 }
