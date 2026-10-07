@@ -193,3 +193,10 @@
 **Why:** This offers a single easy link into the owned platform without pretending that one QR can integrate with every social-media account.
 **What was rejected:** A universal cross-platform login QR, a QR containing bearer credentials, or sending QR contents to a third-party generator.
 **Boundary:** Only this static public entry milestone is approved. The app must be reachable from the device scanning it; `localhost` is computer-only, a classroom LAN address is local-network-only, and global access requires a stable public HTTPS deployment. Deployment, course catalog, learner login/data, attendance, payments, and social connectors are not approved in this step.
+
+## 2026-10-07, Implement and verify the local public QR entry preview
+
+**What was decided:** Add a separate root `frontend/` Next.js app with `/learn` and `/qr`; generate the QR locally from the current site origin and provide a PNG download. Keep the page transparent that courses and classroom features are not available yet. The implementation uses Next.js 16.4.0 and `qrcode.react` 4.2.0.
+**Why:** This completes the approved QR entry milestone without merging the unrelated, divergent admin dashboard or changing the reminder backend.
+**What was rejected:** Exposing authentication or learner data in a QR, using a third-party QR image service, modifying Phase 1 reminders, or deploying before a stable public URL and separate authorization.
+**Verification and handoff:** `npm install` completed with zero reported vulnerabilities; `npm run build` passed and generated `/`, `/learn`, and `/qr`; local HTTP smoke tests returned 200 for all three. Documentation commit: `686a331`; implementation commit: `7547e77`. Neither commit has been pushed.
