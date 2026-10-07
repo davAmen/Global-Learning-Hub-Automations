@@ -1,6 +1,6 @@
 # Global Learning Hub — Master Prompt and Phased Delivery
 
-Last reviewed: 2026-09-26
+Last reviewed: 2026-10-07
 
 ## Copy/paste master prompt
 
@@ -28,6 +28,7 @@ A roadmap item is not permission to implement it. Preserve verified Phase 1 beha
 - The canonical target test suite was run in the Phase 2 worktree on 2026-09-27: 18 passed, with one Starlette test-client deprecation warning.
 - Phase 2 was explicitly activated on 2026-09-27. The operator selected an owned classroom platform for local use over a LAN during internet outages and remote access when online. On 2026-09-27, the operator confirmed the high-level model: each site's hub owns records created locally, the cloud owns remote-origin records, and an acknowledged, duplicate-safe event outbox with human review of conflicts is the sync direction. This supersedes the earlier no-platform and WhatsApp-group classroom directions; preserve the separate Phase 1 WhatsApp reminder service. That high-level approval did not choose a database, API, authentication method, or deployment, and did not authorize code, a real pilot, or real learner data. A later, separate local-only decision added a Supabase Auth record-entry API for the weekly device-readiness notice only; the class platform still has no learner-facing login or attendance model. Define offline identity/access and expiry, session/timezone rules, late/partial/excused states, correction audit, notice/consent, retention, security, exact event/transport details, backup, and hub operations before class-platform schema/API changes. Do not promise remote live sessions during a site internet outage.
 - No real student data, controlled pilot, live sends, production payment credentials, or public launch have been authorized by this roadmap. The one-site/one-class Phase 2 workflow is only a provisional planning assumption, not pilot authorization; see `docs/ARCHITECTURE.md` for the proposed offline/reconnect flow and unresolved decisions.
+- **2026-10-07 bounded activation:** The operator explicitly approved a local-only public `/learn` entry page plus a QR that encodes only that page's URL. This is a narrow first website milestone, not activation of the full Phase 4 catalog/enrollment, learner login, attendance, payments, or social-platform account integration. A globally useful printed QR requires a stable public HTTPS deployment, which remains separately unauthorized. See `docs/DECISIONS.md` and `docs/ARCHITECTURE.md`.
 
 ## Rules that apply to every phase
 
@@ -93,7 +94,7 @@ Prepare teacher-reviewed session plans, exercises, summaries, unanswered questio
 
 ### Phase 4 — Learning website, catalog, and enrollment
 
-Build the already-planned mobile-first, accessible, low-bandwidth catalog and learner journeys after locating the existing frontend or agreeing where it belongs. Show outcomes, prerequisites, language, duration, tutor format, accessibility, and full price/fees when approved. Keep registration and protected learner data server-authorized.
+The operator has activated only the small public `/learn` entry page and `/qr` URL QR described above. Build that isolated milestone first, using the root-level `frontend/` app, without importing the divergent local admin dashboard. The remaining Phase 4 catalog and learner journeys are not activated. When Phase 4 is later expanded, locate/integrate the appropriate frontend deliberately; show outcomes, prerequisites, language, duration, tutor format, accessibility, and full price/fees when approved. Keep registration and protected learner data server-authorized.
 
 **Exit gate:** layouts and access are tested; content and credential claims are reviewed; paid access is not implied by a mock checkout. No extra framework or service without an approved architecture decision.
 

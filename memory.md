@@ -186,3 +186,10 @@
 **Proposed direction, pending review:** Use Supabase Auth for pre-created staff identities, a same-origin Next.js server route to relay authenticated requests, and backend verification of the Supabase identity plus the existing staff role mapping. Never expose the shared admin key or Supabase server secret in browser code. Confirm compatibility with the repo's Next.js version and the current Supabase SSR package status before implementation.
 **Why:** Existing dashboard calls are unauthenticated, while the API requires a shared admin key; sending that key from the browser would disclose it.
 **What was rejected:** Treating the proposed technical design as already approved, putting a long-lived admin credential in frontend configuration, or making public staff sign-up/role assignment.
+
+## 2026-10-07, QR opens the owned learning platform
+
+**What was decided:** The operator approved a narrow local-only public `/learn` entry page and `/qr` page. The QR contains only the absolute `/learn` URL from the app's current origin; it does not authenticate, enroll, check attendance, connect social accounts, or contain personal data or credentials. Use `qrcode.react` to render it locally as SVG, not an external QR service.
+**Why:** This offers a single easy link into the owned platform without pretending that one QR can integrate with every social-media account.
+**What was rejected:** A universal cross-platform login QR, a QR containing bearer credentials, or sending QR contents to a third-party generator.
+**Boundary:** Only this static public entry milestone is approved. The app must be reachable from the device scanning it; `localhost` is computer-only, a classroom LAN address is local-network-only, and global access requires a stable public HTTPS deployment. Deployment, course catalog, learner login/data, attendance, payments, and social connectors are not approved in this step.
