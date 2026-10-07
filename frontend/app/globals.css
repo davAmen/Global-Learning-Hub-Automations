@@ -1,0 +1,219 @@
+:root {
+  color-scheme: light;
+  --ink: #17352f;
+  --muted: #526760;
+  --green: #176b54;
+  --green-dark: #10513f;
+  --surface: #ffffff;
+  --page: #f1f6f3;
+  --line: #d7e3dc;
+  --notice: #fff8e8;
+  --notice-border: #e8c46c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #d28b16;
+  outline-offset: 3px;
+}
+
+.pageShell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.siteHeader,
+.siteFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem clamp(1.25rem, 5vw, 4rem);
+}
+
+.siteHeader {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brandMark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--green);
+  color: white;
+  font-size: 0.8rem;
+}
+
+.headerLink {
+  color: var(--green-dark);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.hero,
+.shareSection {
+  width: min(100% - 2.5rem, 52rem);
+  margin: auto;
+  padding: 4rem 0;
+}
+
+.hero h1,
+.shareSection h1 {
+  max-width: 13ch;
+  margin: 0.5rem 0 1rem;
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.intro {
+  max-width: 42rem;
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.previewNote,
+.localWarning {
+  border: 1px solid var(--notice-border);
+  border-radius: 0.75rem;
+  background: var(--notice);
+  color: #57451c;
+  line-height: 1.6;
+  padding: 1rem 1.1rem;
+}
+
+.primaryButton {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--green);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  margin-top: 1rem;
+  padding: 0.8rem 1.1rem;
+  text-decoration: none;
+}
+
+.primaryButton:hover {
+  background: var(--green-dark);
+}
+
+.shareSection {
+  text-align: center;
+}
+
+.shareSection h1 {
+  max-width: none;
+}
+
+.shareSection .intro {
+  margin: 0 auto 1.75rem;
+}
+
+.qrPanel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+  padding: 1.5rem;
+}
+
+.qrFrame {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.qrFrame canvas {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.qrUrl {
+  overflow-wrap: anywhere;
+  color: var(--green-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.localWarning {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  text-align: left;
+}
+
+.smallPrint {
+  max-width: 38rem;
+  margin: 1.25rem auto 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.siteFooter {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
+@media (max-width: 36rem) {
+  .siteHeader,
+  .siteFooter {
+    align-items: flex-start;
+  }
+
+  .siteFooter {
+    flex-direction: column;
+  }
+
+  .qrPanel {
+    padding: 1rem;
+  }
+}
