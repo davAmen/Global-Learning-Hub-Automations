@@ -1,0 +1,67 @@
+﻿services:
+  - type: web
+    name: global-learning-hub-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: SUPABASE_URL
+        value: https://juljmmenvtmktodzqvly.supabase.co
+      - key: SUPABASE_KEY
+        value: sb_publishable_ChjItpo-dKrM5Zd1w7asYA_affx29Ve
+      - key: JWT_SECRET_KEY
+        value: 9c1118a4e55879cb1c2dbeb91062e2147c677e456628f257a6566c667db3a084
+      - key: WASENDER_API_KEY
+        value: a43204736ea90fe9a3c2b5a1a93079b29c3e7ec6c573f14462c059e092a4866c
+      - key: WASENDER_BASE_URL
+        value: https://www.wasenderapi.com
+      - key: ACTIVE_CHANNEL
+        value: whatsapp
+      - key: BACKUP_CHANNEL
+        value: telegram
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8866089744:AAFYLElSyN1AzkKS59ZnDEh1CLvWySuNyv
+      - key: TELEGRAM_ADMIN_CHAT_ID
+        value: 6286600260
+      - key: ADMIN_EMAIL
+        value: amenukudavid20@gmail.com
+      - key: ADMIN_PHONE
+        value: +233548014157
+      - key: JOB_HOUR
+        value: "8"
+      - key: JOB_MINUTE
+        value: "0"
+      - key: RATE_LIMIT_DELAY_SECONDS
+        value: "6"
+      - key: TZ
+        value: GMT
+      - key: APP_BASE_URL
+        value: https://your-frontend.vercel.app
+      - key: IELTS_COURSE_NAME
+        value: "IELTS Preparation (Oct 15-30, 6-8pm GMT)"
+      - key: IELTS_ANNOUNCEMENT_GROUP_JID
+        value: 120363418173591450@g.us
+      - key: IELTS_PROOF_GROUP_JID
+        value: 120363428841556134@g.us
+      - key: IELTS_CLASS_ACCESS_GROUP_JID
+        value: 120363413380837553@g.us
+      - key: IELTS_START_DATE
+        value: "2026-10-15"
+      - key: IELTS_END_DATE
+        value: "2026-10-30"
+      - key: IELTS_CLASS_TIME
+        value: "18:00-20:00 GMT"
+      - key: IELTS_MOMO_NUMBER
+        value: +233548014157
+      - key: IELTS_TELECEL_NUMBER
+        value: +23333206967251
+      - key: IELTS_REFERENCE
+        value: ILETS
+      - key: IELTS_AMOUNT
+        value: "100.0"
+      - key: IELTS_CURRENCY
+        value: GHS
+      - key: AUTO_APPROVE_REMINDERS
+        value: "false"
+      - key: ENABLE_IELTS_REMINDERS
+        value: "true"
