@@ -8,7 +8,7 @@ Kept deliberately minimal per DECISIONS.md:
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 
 LOW_ENGAGEMENT_DAYS = 7
 NEEDS_FOLLOWUP_DAYS = 14
@@ -58,7 +58,7 @@ def update_engagement(db, enrollment_id, reference: date | None = None) -> str:
         "date": reference.isoformat(),
         "status": status,
         "assignment_submitted": status == "active",
-        "updated_at": date.today().isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
     }
 
     if existing.data:
