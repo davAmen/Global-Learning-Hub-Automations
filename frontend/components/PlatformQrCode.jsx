@@ -3,36 +3,43 @@
 import { useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 
-function isLocalAddress(hostname) {
+function getLocalAccessScope(hostname) {
   const normalizedHost = hostname.replace(/^\[|\]$/g, "").toLowerCase();
   if (
     normalizedHost === "localhost" ||
     normalizedHost === "::1" ||
-    normalizedHost.endsWith(".local")
+    normalizedHost.startsWith("127.")
   ) {
-    return true;
+    return "same-device";
+  }
+
+  if (normalizedHost.endsWith(".local")) {
+    return "local-network";
   }
 
   const octets = normalizedHost.split(".").map(Number);
   if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)) {
-    return false;
+    if (normalizedHost.includes(":") && /^(fc|fd|fe80):/i.test(normalizedHost)) {
+      return "local-network";
+    }
+    return null;
   }
 
-  return (
+  const isPrivateAddress = (
     octets[0] === 10 ||
-    octets[0] === 127 ||
     (octets[0] === 192 && octets[1] === 168) ||
     (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31)
   );
+  return isPrivateAddress ? "local-network" : null;
 }
 
 export default function PlatformQrCode() {
   const [entryUrl, setEntryUrl] = useState("");
-  const [isLocal, setIsLocal] = useState(false);
+  const [localAccessScope, setLocalAccessScope] = useState(null);
 
   useEffect(() => {
     setEntryUrl(new URL("/learn", window.location.origin).toString());
-    setIsLocal(isLocalAddress(window.location.hostname));
+    setLocalAccessScope(getLocalAccessScope(window.location.hostname));
   }, []);
 
   function downloadQr() {
@@ -69,11 +76,20 @@ export default function PlatformQrCode() {
       <button className="primaryButton" type="button" onClick={downloadQr}>
         Download QR image (PNG)
       </button>
-      {isLocal && (
+      {localAccessScope === "same-device" && (
         <p className="localWarning" role="note">
-          This is a local address. The QR will work only on this computer or on
-          devices that can reach this local network. A reusable QR for people
-          anywhere needs a stable public website address and a later deployment.
+          This QR contains a loopback address. It opens only on this computer;
+          scanning it with a phone points back to the phone itself. To test from
+          another device, use this computer&apos;s reachable local-network
+          address. Access from anywhere needs a stable public HTTPS address and
+          a later deployment.
+        </p>
+      )}
+      {localAccessScope === "local-network" && (
+        <p className="localWarning" role="note">
+          This QR contains a private or local-network address. It works only on
+          devices that can reach this computer on that network. Access from
+          anywhere needs a stable public HTTPS address and a later deployment.
         </p>
       )}
     </div>
