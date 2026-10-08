@@ -139,12 +139,12 @@ export default function DashboardPage() {
                   <p style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "1rem" }}>Course ID: {enrollment.course_id}</p>
                   <div style={{ display: "flex", gap: "0.5rem", marginTop: "auto" }}>
                     {enrollment.status === "active" && (
-                      <Link href="/dashboard/course" style={{ flex: 1, textAlign: "center", padding: "0.625rem 1rem", background: "#2563eb", color: "#fff", borderRadius: "0.5rem", fontWeight: 600, textDecoration: "none" }}>Continue Learning</Link>
+                      <Link href={`/courses/${enrollment.course_id}`} style={{ flex: 1, textAlign: "center", padding: "0.625rem 1rem", background: "#2563eb", color: "#fff", borderRadius: "0.5rem", fontWeight: 600, textDecoration: "none" }}>Continue Learning</Link>
                     )}
                     {enrollment.status === "seat_reserved" && (
-                      <Link href="/courses" style={{ flex: 1, textAlign: "center", padding: "0.625rem 1rem", background: "#fef3c7", color: "#92400e", borderRadius: "0.5rem", fontWeight: 600, textDecoration: "none" }}>Complete Payment</Link>
+                      <Link href={`/courses/${enrollment.course_id}`} style={{ flex: 1, textAlign: "center", padding: "0.625rem 1rem", background: "#fef3c7", color: "#92400e", borderRadius: "0.5rem", fontWeight: 600, textDecoration: "none" }}>Complete Payment</Link>
                     )}
-                    <button style={{ padding: "0.625rem 1rem", background: "#f3f4f6", color: "#374151", border: "1px solid #d1d5db", borderRadius: "0.5rem", fontWeight: 500, cursor: "pointer" }}>Details</button>
+                    <Link href={`/courses/${enrollment.course_id}`} style={{ padding: "0.625rem 1rem", background: "#f3f4f6", color: "#374151", border: "1px solid #d1d5db", borderRadius: "0.5rem", fontWeight: 500, textDecoration: "none" }}>Details</Link>
                   </div>
                 </article>
               );
