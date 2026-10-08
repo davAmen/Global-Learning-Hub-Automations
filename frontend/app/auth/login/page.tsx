@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem", background: "#f9fafb" }}>
       <div style={{ width: "100%", maxWidth: "420px", background: "#fff", borderRadius: "1rem", padding: "2.5rem", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "1.5rem", fontWeight: 800", color: "#2563eb", textDecoration: "none", marginBottom: "1.5rem" }}>
+          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "1.5rem", fontWeight: 800, color: "#2563eb", textDecoration: "none", marginBottom: "1.5rem" }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             <span>Global Learning Hub</span>
           </Link>
@@ -45,7 +45,7 @@ export default function LoginPage() {
             <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", padding: "0.875rem 1rem", borderRadius: "0.5rem", fontSize: "0.875rem" }}>
               {error}
             </div>
-          )}
+)}
 
           <div>
             <label htmlFor="email" style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, color: "#374151", marginBottom: "0.5rem" }}>Email</label>

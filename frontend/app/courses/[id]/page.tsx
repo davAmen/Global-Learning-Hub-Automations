@@ -3,28 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { fetchCourse, fetchCourseStatus, reserveSeat, enrollInCourse } from "@/lib/api";
-
-interface Course {
-  id: string;
-  name: string;
-  description?: string;
-  start_date?: string;
-  class_time?: string;
-  timezone?: string;
-  price_minor: number;
-  currency: string;
-  capacity?: number;
-  seat_reservation_minor: number;
-  expected_study_hours?: number;
-  learning_outcomes: string[];
-  prerequisites: string[];
-  support_email?: string;
-  support_phone?: string;
-  whatsapp_group_jid?: string;
-  proof_submission_group_jid?: string;
-  is_active: boolean;
-}
+import { fetchCourse, fetchCourseStatus, reserveSeat, enrollInCourse, type Course } from "@/lib/api";
 
 interface CourseStatus {
   course: Course;
@@ -94,12 +73,6 @@ export default function CourseDetailPage() {
     }
   };
 
-  const formatPrice = (minor: number, currency: string) => {
-    const major = (minor / 100).toFixed(2);
-    const symbols: Record<string, string> = { GHS: "₵", USD: "$", EUR: "€" };
-    return `${symbols[currency] || currency} ${major}`;
-  };
-
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -150,7 +123,7 @@ export default function CourseDetailPage() {
         </header>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "2rem" }}>
-          <section style={{ spaceY: "2rem" }}>
+          <section style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem", padding: "1.5rem", background: "#f9fafb", borderRadius: "0.75rem" }}>
               {course.start_date && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -254,7 +227,7 @@ export default function CourseDetailPage() {
 
               {isEnrolled && (
                 <div style={{ background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: "0.5rem", padding: "1rem", marginBottom: "1.5rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#166534", fontWeight: 600" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#166534", fontWeight: 600 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
                     <span>You're enrolled!</span>
                   </div>
@@ -264,7 +237,7 @@ export default function CourseDetailPage() {
 
               {hasSeatReserved && (
                 <div style={{ background: "#fef3c7", border: "1px solid #fde68a", borderRadius: "0.5rem", padding: "1rem", marginBottom: "1.5rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#92400e", fontWeight: 600" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#92400e", fontWeight: 600 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                     <span>Seat Reserved</span>
                   </div>
@@ -299,7 +272,7 @@ export default function CourseDetailPage() {
                   {seatsAvailable === 0 ? "This course is full" : "Enrolment not available"}
                 </div>
               )}
-            </>
+            </div>
           </aside>
         </div>
       </article>

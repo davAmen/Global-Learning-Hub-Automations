@@ -30,11 +30,36 @@ export async function runDailyJob() {
 }
 
 // Courses
-export async function fetchCourses() {
+export interface CoursesResponse {
+  courses: Course[];
+}
+
+export async function fetchCourses(): Promise<CoursesResponse> {
   return fetchJson(`${API_URL}/courses`);
 }
 
-export async function fetchCourse(courseId: string) {
+export interface Course {
+  id: string;
+  name: string;
+  description?: string;
+  start_date?: string;
+  class_time?: string;
+  timezone?: string;
+  price_minor: number;
+  currency: string;
+  capacity?: number;
+  seat_reservation_minor: number;
+  expected_study_hours?: number;
+  learning_outcomes: string[];
+  prerequisites: string[];
+  support_email?: string;
+  support_phone?: string;
+  whatsapp_group_jid?: string;
+  proof_submission_group_jid?: string;
+  is_active: boolean;
+}
+
+export async function fetchCourse(courseId: string): Promise<Course> {
   return fetchJson(`${API_URL}/courses/${courseId}`);
 }
 
@@ -124,21 +149,7 @@ export async function verifyEmail(token: string) {
 
 // Enrolments
 export interface CourseStatus {
-  course: {
-    id: string;
-    name: string;
-    description?: string;
-    start_date?: string;
-    class_time?: string;
-    price_minor: number;
-    currency: string;
-    seat_reservation_minor: number;
-    expected_study_hours?: number;
-    learning_outcomes: string[];
-    prerequisites: string[];
-    capacity?: number;
-    seats_available?: number;
-  };
+  course: Course;
   enrollment?: {
     id: string;
     status: string;
