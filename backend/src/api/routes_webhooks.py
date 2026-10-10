@@ -25,6 +25,8 @@ def verify_webhook_signature(
     secret: str,
 ) -> bool:
     """Verify WasenderAPI webhook signature."""
+    logger.warning(f"DEBUG ENTRY: payload={payload[:50] if payload else None}, sig={signature[:20] if signature else None}, secret_prefix={secret[:8] if secret else None}")
+    
     if not signature or not secret:
         logger.warning("Missing webhook signature or secret")
         return False
