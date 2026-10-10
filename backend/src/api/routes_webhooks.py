@@ -352,20 +352,3 @@ async def handle_group_event(channel: str, payload: dict):
                 "settings": group,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }, on_conflict="whatsapp_jid").execute()
-
-
-def verify_webhook_signature(payload: bytes, signature: Optional[str], secret: str) -> bool:
-    """Verify WasenderAPI webhook signature using HMAC-SHA256."""
-    import hmac
-    import hashlib
-    
-    if not signature or not secret:
-        return False
-    
-    expected = hmac.new(
-        secret.encode(),
-        payload,
-        hashlib.sha256
-    ).hexdigest()
-    
-    return hmac.compare_digest(expected, signature)
