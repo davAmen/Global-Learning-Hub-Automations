@@ -1,6 +1,6 @@
 # Global Learning Hub — Master Prompt and Phased Delivery
 
-Last reviewed: 2026-10-07
+Last reviewed: 2026-10-10
 
 ## Copy/paste master prompt
 
@@ -21,14 +21,14 @@ A roadmap item is not permission to implement it. Preserve verified Phase 1 beha
 
 ## Current repository and handoff
 
-- The canonical integration target selected by the operator is `davAmen/Global-Learning-Hub-Automations`. Phase 1 PR #3 was merged to GitHub `main` at `aac1957` on 2026-09-27. The active clean worktree is on `feat/phase-2-attendance`, based on that merge commit. The older local `main` remains separate and must be preserved.
-- This checkout's backend is at repository root (`src/`, `scripts/`, `tests/`) and has no checked-in frontend directory. `docs/ARCHITECTURE.md` describes a Next.js frontend as a separate tree, so confirm its actual repository/location before frontend work.
+- The canonical integration target selected by the operator is `davAmen/Global-Learning-Hub-Automations`. Phase 1 PR #3 was merged to GitHub `main` at `aac1957` on 2026-09-27. The active worktree is on `feat/phase-2-attendance`, based on that merge commit; inspect `git status` before continuing. The older local `main` remains separate and must be preserved.
+- This checkout contains the backend at repository root (`src/`, `scripts/`, `tests/`) and the isolated public-entry Next.js frontend in `frontend/`. The frontend provides only `/`, `/learn`, and `/qr`; it is deployed at <https://globallearninghub.vercel.app>. Do not infer that classroom, catalog, login, attendance, or payment features exist.
 - The prior local checkout used `backend/` and `frontend/`. At reconciliation, Git showed seven local-only commits and four GitHub-only commits. Do not merge or push either whole tree blindly. Review and port only the changes that fit this repository and preserve its GitHub-only security and product documentation.
 - `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` define the current Phase 1 implementation and decisions. `docs/PLATFORM_BRIEF.md` defines the already-approved public learning platform direction; this prompt adds the operator's attendance, classroom-agent, marketing, and partnership goals without replacing that brief.
-- The canonical target test suite was run in the Phase 2 worktree on 2026-09-27: 18 passed, with one Starlette test-client deprecation warning.
+- The backend test suite was run in this Phase 2 worktree on 2026-10-10: 68 passed, with one existing Starlette/httpx deprecation warning. The frontend production build and Vercel production build also passed.
 - Phase 2 was explicitly activated on 2026-09-27. The operator selected an owned classroom platform for local use over a LAN during internet outages and remote access when online. On 2026-09-27, the operator confirmed the high-level model: each site's hub owns records created locally, the cloud owns remote-origin records, and an acknowledged, duplicate-safe event outbox with human review of conflicts is the sync direction. This supersedes the earlier no-platform and WhatsApp-group classroom directions; preserve the separate Phase 1 WhatsApp reminder service. That high-level approval did not choose a database, API, authentication method, or deployment, and did not authorize code, a real pilot, or real learner data. A later, separate local-only decision added a Supabase Auth record-entry API for the weekly device-readiness notice only; the class platform still has no learner-facing login or attendance model. Define offline identity/access and expiry, session/timezone rules, late/partial/excused states, correction audit, notice/consent, retention, security, exact event/transport details, backup, and hub operations before class-platform schema/API changes. Do not promise remote live sessions during a site internet outage.
-- No real student data, controlled pilot, live sends, production payment credentials, or public launch have been authorized by this roadmap. The one-site/one-class Phase 2 workflow is only a provisional planning assumption, not pilot authorization; see `docs/ARCHITECTURE.md` for the proposed offline/reconnect flow and unresolved decisions.
-- **2026-10-07 bounded activation:** The operator explicitly approved a local-only public `/learn` entry page plus a QR that encodes only that page's URL. This is a narrow first website milestone, not activation of the full Phase 4 catalog/enrollment, learner login, attendance, payments, or social-platform account integration. A globally useful printed QR requires a stable public HTTPS deployment, which remains separately unauthorized. See `docs/DECISIONS.md` and `docs/ARCHITECTURE.md`.
+- No real student data, controlled pilot, live sends, production payment credentials, or launch beyond the existing public entry pages are authorized. The one-site/one-class Phase 2 workflow is only a provisional planning assumption, not pilot authorization; see `docs/ARCHITECTURE.md` for the proposed offline/reconnect flow and unresolved decisions.
+- **2026-10-07 bounded activation, updated 2026-10-10:** The operator approved a narrow public `/learn` entry page plus a QR that encodes only that page's URL, then explicitly authorized deploying these pages to the existing Vercel project. The production site is <https://globallearninghub.vercel.app>. This does not activate the full Phase 4 catalog/enrollment, learner login, attendance, payments, or social-platform account integration. See `docs/DECISIONS.md` and `docs/ARCHITECTURE.md`.
 
 ## Rules that apply to every phase
 

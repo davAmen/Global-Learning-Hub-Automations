@@ -83,15 +83,20 @@ export default function PlatformQrCode() {
           This QR contains a loopback address. It opens only on this computer;
           scanning it with a phone points back to the phone itself. To test from
           another device, use this computer&apos;s reachable local-network
-          address. Access from anywhere needs a stable public HTTPS address and
-          a later deployment.
+          address. To share globally, use the public QR page at{" "}
+          <a href="https://globallearninghub.vercel.app/qr">
+            globallearninghub.vercel.app/qr
+          </a>.
         </p>
       )}
       {localAccessScope === "local-network" && (
         <p className="localWarning" role="note">
           This QR contains a private or local-network address. It works only on
-          devices that can reach this computer on that network. Access from
-          anywhere needs a stable public HTTPS address and a later deployment.
+          devices that can reach this computer on that network. For global
+          access, use the public QR page at{" "}
+          <a href="https://globallearninghub.vercel.app/qr">
+            globallearninghub.vercel.app/qr
+          </a>.
         </p>
       )}
     </div>
