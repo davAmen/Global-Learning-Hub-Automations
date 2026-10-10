@@ -210,11 +210,26 @@
 ## 2026-10-10, Progress audit baseline
 
 **Status:** The active `feat/phase-2-attendance` worktree was clean before this audit. Baseline checks: backend `68 passed, 1 Starlette/httpx deprecation warning`; frontend `npm run build` passed and prerendered `/`, `/learn`, and `/qr`. The production server returned `/learn` 200, `/qr` 200, root 307 to `/learn`, and unknown route 404. The QR rendered and the narrow viewport had no horizontal overflow. The Codex in-app browser did not surface a PNG download event, so download behavior still needs verification in a normal browser; this is not proof that a user-facing browser download fails.
-**Deployment blocker found:** No Vercel CLI, Vercel project link, VERCEL_TOKEN, or cached Vercel login was present in this environment. No deployment has happened.
+**Deployment setup at audit start:** The Vercel CLI and project link were absent, and no `VERCEL_TOKEN` environment variable was set. The CLI could not access its standard settings folder until narrow filesystem permission was granted; it then authenticated successfully. See the deployment completion below.
 
 ## 2026-10-10, QR audit completion
 
 **Changes:** Replaced deprecated `qrcode.react` `includeMargin` with `marginSize={4}` and attached the temporary PNG download link to the document before clicking it, then removed it.
 **Verification:** Backend: `68 passed, 1 warning`. Frontend: `npm run build` passed and prerendered `/`, `/learn`, and `/qr`. Production smoke test: `/learn` 200, `/qr` 200, `/` 307 to `/learn`, and an unknown route 404. `git diff --check` passed. QR rendered at the local preview and no horizontal overflow was found on the tested narrow viewport.
 **Unverified limitation:** The Codex in-app browser emitted no download event and the local Downloads file timestamp did not change after clicking. It reported no browser console errors. Confirm PNG saving in a regular browser before claiming download is fully verified; the in-app browser may not expose downloads.
-**Deployment status:** Network permission was granted to fetch the official Vercel CLI, but no project was guessed. No backend, database, learner data, or messages were deployed. Continue only after confirming the intended Vercel project and completing account authentication if required.
+**Deployment status:** The official Vercel CLI was fetched into a temporary cache. After listing the account's projects, the existing exact-name `global_learning_hub` project was linked to `frontend/`. Its “Other” preset and `public` output expectation caused an initial preview build failure; changing only the framework preset to Next.js fixed it. Both preview and production builds passed. Production is live at <https://globallearninghub.vercel.app>; public checks returned `/learn` 200, `/qr` 200, and `/` 307 to `/learn`. A production error-log query returned no logs. The preview is protected by Vercel authentication, as expected.
+**Deployment boundary:** Only the static public-entry frontend was deployed. No backend, live database, real learner data, or messaging was included. Vercel's generated local `.env.local` contains CLI authentication state and is ignored by Git; do not read, print, stage, or commit it.
+
+## 2026-10-10, Production public QR deployment
+
+**What was decided:** Deploy only the public entry pages to the existing Vercel project `global_learning_hub`; make Next.js the project's detected framework and use automatic build/output settings.
+**Why:** The initial Vercel build failed because the project was configured as “Other” and expected a `public` folder even though this app builds as Next.js.
+**What was rejected:** Creating another project, changing domains or environment variables, deploying the backend/data, or publishing classroom features.
+**Result:** Production deployment is READY at <https://globallearninghub.vercel.app>. `/learn` and `/qr` return HTTP 200; `/` redirects to `/learn`; no production errors were found in the last-five-minute log query. The QR canvas and PNG button are present in the live page DOM, and its QR URL uses the stable HTTPS production origin. PNG download was not confirmed through the Codex in-app browser; that browser did not emit a download event on the local preview. Confirm manually in a regular browser.
+
+## 2026-10-10, GitHub branch handoff
+
+**What was decided:** Point the active worktree's `origin` to `https://github.com/davAmen/Global-Learning-Hub-Automations.git` and publish only `feat/phase-2-attendance`; keep `main` and the original local worktree unchanged.
+**Why:** The previous `origin` pointed to a local Desktop folder, so a push could not reach the selected GitHub repository.
+**What was rejected:** Pushing to the old Desktop-folder remote, force-pushing, or merging the feature branch into `main`.
+**Status:** Commit `7c8323b` is local and the GitHub repository is reachable with OpenSSL, but the push is waiting for GitHub authentication. No credential or private information was written to the repository.
