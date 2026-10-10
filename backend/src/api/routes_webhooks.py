@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 PROOF_GROUP_JID = "120363428841556134@g.us"
 
 
-async def verify_webhook_signature(
+def verify_webhook_signature(
     payload: bytes,
     signature: Optional[str],
     secret: str,
@@ -80,7 +80,7 @@ async def handle_webhook(
     
     # Verify signature
     secret = await get_webhook_secret()
-    if not await verify_webhook_signature(body, sig, secret):
+    if not verify_webhook_signature(body, sig, secret):
         logger.warning(f"Invalid webhook signature for channel {channel}")
         raise HTTPException(401, "Invalid signature")
     

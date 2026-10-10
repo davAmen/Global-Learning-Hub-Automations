@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchCourses } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 interface Course {
   id: string;
   name: string;

@@ -11,21 +11,27 @@ export function AuthNav() {
   const router = useRouter();
 
   useEffect(() => {
+    let mounted = true;
     const initAuth = async () => {
       try {
         const profile = await fetchProfile();
-        setUser(profile);
+        if (mounted) setUser(profile);
       } catch {
-        setUser(null);
+        if (mounted) setUser(null);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     initAuth();
+    return () => { mounted = false; };
   }, []);
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+    } catch {
+      // ignore logout errors
+    }
     setUser(null);
     router.push("/");
   };
