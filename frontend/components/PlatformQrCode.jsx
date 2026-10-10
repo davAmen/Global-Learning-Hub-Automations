@@ -51,7 +51,9 @@ export default function PlatformQrCode() {
     const downloadLink = document.createElement("a");
     downloadLink.href = canvas.toDataURL("image/png");
     downloadLink.download = "global-learning-hub-qr.png";
+    document.body.appendChild(downloadLink);
     downloadLink.click();
+    downloadLink.remove();
   }
 
   if (!entryUrl) {
@@ -66,7 +68,7 @@ export default function PlatformQrCode() {
           value={entryUrl}
           size={400}
           level="M"
-          includeMargin
+          marginSize={4}
           title="QR code linking to the Global Learning Hub public page"
         />
       </div>

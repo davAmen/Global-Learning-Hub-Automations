@@ -200,3 +200,21 @@
 **Why:** This completes the approved QR entry milestone without merging the unrelated, divergent admin dashboard or changing the reminder backend.
 **What was rejected:** Exposing authentication or learner data in a QR, using a third-party QR image service, modifying Phase 1 reminders, or deploying before a stable public URL and separate authorization.
 **Verification and handoff:** `npm install` completed with zero reported vulnerabilities; `npm run build` passed and generated `/`, `/learn`, and `/qr`; local HTTP smoke tests returned 200 for all three. Documentation commit: `686a331`; implementation commit: `7547e77`. Neither commit has been pushed.
+
+## 2026-10-10, Public QR production deploy and PNG format
+
+**What was decided:** The operator authorized production deployment of only the existing public frontend routes (`/`, `/learn`, `/qr`) to Vercel. The operator also confirmed PNG as the QR download format for cross-platform social sharing. Keep the backend, live database, real learner data, messaging, and later phases out of this deployment.
+**Why:** A stable public HTTPS URL is needed for the reusable QR, and PNG is convenient to share on social platforms.
+**What was rejected:** Publishing the backend or learner data, making live database changes, or replacing the PNG download with SVG-only output.
+
+## 2026-10-10, Progress audit baseline
+
+**Status:** The active `feat/phase-2-attendance` worktree was clean before this audit. Baseline checks: backend `68 passed, 1 Starlette/httpx deprecation warning`; frontend `npm run build` passed and prerendered `/`, `/learn`, and `/qr`. The production server returned `/learn` 200, `/qr` 200, root 307 to `/learn`, and unknown route 404. The QR rendered and the narrow viewport had no horizontal overflow. The Codex in-app browser did not surface a PNG download event, so download behavior still needs verification in a normal browser; this is not proof that a user-facing browser download fails.
+**Deployment blocker found:** No Vercel CLI, Vercel project link, VERCEL_TOKEN, or cached Vercel login was present in this environment. No deployment has happened.
+
+## 2026-10-10, QR audit completion
+
+**Changes:** Replaced deprecated `qrcode.react` `includeMargin` with `marginSize={4}` and attached the temporary PNG download link to the document before clicking it, then removed it.
+**Verification:** Backend: `68 passed, 1 warning`. Frontend: `npm run build` passed and prerendered `/`, `/learn`, and `/qr`. Production smoke test: `/learn` 200, `/qr` 200, `/` 307 to `/learn`, and an unknown route 404. `git diff --check` passed. QR rendered at the local preview and no horizontal overflow was found on the tested narrow viewport.
+**Unverified limitation:** The Codex in-app browser emitted no download event and the local Downloads file timestamp did not change after clicking. It reported no browser console errors. Confirm PNG saving in a regular browser before claiming download is fully verified; the in-app browser may not expose downloads.
+**Deployment status:** Network permission was granted to fetch the official Vercel CLI, but no project was guessed. No backend, database, learner data, or messages were deployed. Continue only after confirming the intended Vercel project and completing account authentication if required.
