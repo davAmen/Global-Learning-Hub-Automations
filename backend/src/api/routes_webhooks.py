@@ -29,12 +29,19 @@ def verify_webhook_signature(
         logger.warning("Missing webhook signature or secret")
         return False
     
+    logger.info(f"Verifying signature - payload len: {len(payload)}, secret prefix: {secret[:8]}...")
+    logger.info(f"Payload: {payload}")
+    logger.info(f"Received signature: {signature}")
+    
     # WasenderAPI uses HMAC-SHA256
     expected = hmac.new(
         secret.encode(),
         payload,
         hashlib.sha256
     ).hexdigest()
+    
+    logger.info(f"Expected signature: {expected}")
+    logger.info(f"Match: {hmac.compare_digest(expected, signature)}")
     
     # Compare signatures (constant-time comparison)
     return hmac.compare_digest(expected, signature)
