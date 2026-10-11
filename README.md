@@ -1,57 +1,85 @@
-# Global Learning Hub — Reminder & Engagement Automation (Phase 1)
+# Global Learning Hub
 
-The first automation for the Global Learning Hub learning-hub operation:
-a daily job that sends class reminders to students and reports engagement
-to the administrator.
+A mobile-first, low-bandwidth learning platform for learners in Ghana and beyond. Delivers structured courses via web app + optional WhatsApp reminders, with secure enrolment, payment, progress tracking, and completion verification.
 
-**Read first:** `docs/AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`.
-Those three files are the source of truth for this repository.
+---
 
-The requested learning platform expansion is specified in `docs/PLATFORM_BRIEF.md`.
-The current code is the reminder service, not a deployed course marketplace.
+## Quick Links
 
-## What it does
+| Document | Description |
+|----------|-------------|
+| [Backend README](backend/README.md) | Full setup, API, deployment, architecture |
+| [Project Description](docs/PROJECT_DESCRIPTION.md) | Technical overview, API, DB, flows, env vars |
+| [Product Readiness](docs/PRODUCT_READINESS.md) | Launch checklist — what's ready, what blocks pilot |
+| [Live Test Report](docs/LIVE_TEST_REPORT.md) | Actual test results, evidence, limitations |
+| [Architecture](docs/ARCHITECTURE.md) | Technical specification (source of truth) |
+| [Decisions](docs/DECISIONS.md) | 20 architectural decisions |
+| [Agents](docs/AGENTS.md) | Instructions for AI agents |
 
-1. Every day a scheduled job figures out which students need a reminder.
-2. It sends that reminder through exactly **one** delivery channel
-   (currently `whatsapp`).
-3. It logs every send to `reminder_log` and to a log file.
-4. It marks students as `active` / `low_engagement` / `needs_followup`.
-5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled runs.
+---
 
-## Stack
-
-- Backend: Python + FastAPI
-- Database: Supabase (Postgres) — the only data store
-- Scheduling: APScheduler
-- Delivery: a single active channel, chosen in `config.py`
-
-## Quick start (local, fake data only)
+## Quick Start
 
 ```bash
+# Backend
+cd backend
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env   # keep provider tokens blank during local testing
-python scripts\seed_sample_data.py   # inserts FAKE students/courses into the configured database
-python scripts\run_daily_job.py      # can send messages if real provider credentials are configured
-uvicorn src.main:app --reload        # start the API
+copy .env.example .env
+python scripts\seed_sample_data.py
+python scripts\run_daily_job.py
+uvicorn src.main:app --reload
+
+# Frontend (separate terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
-> **Use synthetic student data only until a controlled pilot is explicitly authorized.** Keep WhatsApp and Telegram credentials blank during local testing. The sample numbers are fictional placeholders, not authorized recipients. The seed script requires a configured database; use a non-production test database, never a live student database.
+**Backend:** http://localhost:8000  
+**Frontend:** http://localhost:3000 (requires `NEXT_PUBLIC_API_URL=http://localhost:8000`)
 
-Set a long random `ADMIN_API_KEY` in `.env` and send it in the `X-Admin-Key`
-header for `/run-daily-job` and `/reports/today`. Never expose that key in a
-public web page. The delivery webhook currently responds 501 until signed
-provider payload verification and provider-message-ID mapping are built.
+---
 
-## API
+## Current Status
 
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/health` | GET | Uptime check |
-| `/run-daily-job` | POST | Manually triggers the full daily flow |
-| `/webhooks/{channel}` | POST | Receives delivery-status callbacks |
-| `/reports/today` | GET | Today's engagement report as JSON |
+| Area | Status |
+|------|--------|
+| Backend API | ✅ 56 tests passing |
+| Frontend | ⚠️ Partial (home, courses, run-job only) |
+| Database | ⚠️ Migrations written, not run live |
+| Payments | ⚠️ Adapters ready, provider undecided |
+| WhatsApp | ❌ WasenderAPI not configured |
+| Auth | ✅ JWT + HttpOnly cookies |
+| Enrolment flow | ✅ Seat reserve → pay → verify |
+| Daily reminders | ✅ 8am GMT + IELTS 5am GMT |
 
-See `docs/ARCHITECTURE.md` for the full specification.
+---
+
+## Next Steps (Priority)
+
+1. **Choose payment provider** — Paystack vs SeefCash vs Stripe
+2. **Create Supabase project** → run migrations → seed IELTS course
+3. **Build 4 frontend pages** — catalogue, course detail, login, register
+4. **Create IELTS lesson content** (5-10 MDX files)
+4. **Configure payment sandbox + WasenderAPI**
+5. **Deploy preview** → recruit 10-20 pilot learners
+
+See [Product Readiness](docs/PRODUCT_READINESS.md) for full checklist.
+
+---
+
+## Deployment Targets
+
+- **Frontend:** Vercel
+- **Backend:** Railway (always-on for APScheduler)
+- **Database:** Supabase (PostgreSQL + RLS)
+- **WhatsApp:** WasenderAPI
+- **Payments:** Paystack / SeefCash / Stripe (choose one)
+
+---
+
+## License
+
+Proprietary — Global Learning Hub

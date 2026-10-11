@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+supabase
+python-dotenv
+pydantic-settings
+apscheduler
+httpx
+pytest
+pytz
+bcrypt
+python-jose
+email-validator
+pytest-asyncio
