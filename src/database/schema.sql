@@ -48,6 +48,18 @@ create table if not exists reminder_log (
   delivery_status text not null default 'pending'
 );
 
+-- Backend-only data access: browser roles receive no direct table privileges.
+alter table students enable row level security;
+alter table courses enable row level security;
+alter table enrollments enable row level security;
+alter table engagement_log enable row level security;
+alter table reminder_log enable row level security;
+
+revoke all on table students, courses, enrollments, engagement_log, reminder_log
+  from public, anon, authenticated;
+grant select, insert, update on table students, courses, enrollments,
+  engagement_log, reminder_log to service_role;
+
 create index if not exists idx_enrollments_status on enrollments(status);
 create index if not exists idx_reminder_enrollment on reminder_log(enrollment_id);
 create index if not exists idx_reminder_sent_at on reminder_log(sent_at);

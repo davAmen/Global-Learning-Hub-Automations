@@ -33,12 +33,12 @@ python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env   # keep provider tokens blank during local testing
-python scripts\seed_sample_data.py   # inserts FAKE students/courses into the configured database
+python scripts\seed_sample_data.py --confirm-test-database  # repeatable fake records; only for a non-production test database
 python scripts\run_daily_job.py      # can send messages if real provider credentials are configured
 uvicorn src.main:app --reload        # start the API
 ```
 
-> **Use synthetic student data only until a controlled pilot is explicitly authorized.** Keep WhatsApp and Telegram credentials blank during local testing. The sample numbers are fictional placeholders, not authorized recipients. The seed script requires a configured database; use a non-production test database, never a live student database.
+> **Use synthetic student data only until a controlled pilot is explicitly authorized.** Keep WhatsApp and Telegram credentials blank during local testing. The sample numbers are fictional placeholders, not authorized recipients. The seed script requires a configured database and the explicit `--confirm-test-database` flag; use a non-production test database, never a live student database. The flag is a deliberate operator check, not automatic proof that the configured Supabase project is non-production.
 
 Set a long random `ADMIN_API_KEY` in `.env` and send it in the `X-Admin-Key`
 header for `/run-daily-job` and `/reports/today`. Never expose that key in a

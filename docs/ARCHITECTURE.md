@@ -73,7 +73,7 @@ global-learning-hub-automation/
       logger.py
 
   scripts/
-    seed_sample_data.py         # fake students/courses -- used until real-data authorization
+    seed_sample_data.py         # repeatable fake records; requires --confirm-test-database
     run_daily_job.py            # manual CLI trigger, for local testing
 
   tests/
@@ -88,6 +88,7 @@ global-learning-hub-automation/
     ARCHITECTURE.md
     AGENTS.md
     DECISIONS.md
+    READINESS_AUDIT.md
 ```
 
 ## Frontend Directory Structure
@@ -171,6 +172,21 @@ create table if not exists reminder_log (
   sent_at         timestamptz not null default now(),
   delivery_status text not null default 'pending'
 );
+```
+
+These tables are accessed through the backend only; the frontend never connects directly to Supabase. Enable row-level security on all five Phase 1 tables, revoke table access from `PUBLIC`, `anon`, and `authenticated`, and grant the server-only `service_role` only the `SELECT`, `INSERT`, and `UPDATE` privileges used by this application. No client policy is needed. Because `service_role` bypasses row-level security, every backend route must still enforce its own authorization and the key must never reach a browser. The SQL definitions below are source changes only; they do not update an existing Supabase project. Verify the live grants and apply any approved migration separately before storing real learner data.
+
+```sql
+alter table students enable row level security;
+alter table courses enable row level security;
+alter table enrollments enable row level security;
+alter table engagement_log enable row level security;
+alter table reminder_log enable row level security;
+
+revoke all on table students, courses, enrollments, engagement_log, reminder_log
+  from public, anon, authenticated;
+grant select, insert, update on table students, courses, enrollments,
+  engagement_log, reminder_log to service_role;
 ```
 
 The `engagement_log` unique key is required by the daily upsert conflict target. For every new send, the application writes a deterministic `idempotency_key` before contacting a provider: one key per enrollment and scheduled date for a learner reminder, and one key per report date for the administrator report. The unique constraint is the cross-process duplicate guard; a pre-send lookup alone is not atomic. Existing rows may have a null key, but all new application send attempts must include one. If a key already exists, do not send again. An unfinalized `pending` row remains visible for human review and is not automatically retried.
@@ -355,11 +371,13 @@ EMAIL_API_KEY=
 ADMIN_EMAIL=
 ADMIN_PHONE=
 
+SMTP_PORT=587
 RATE_LIMIT_DELAY_SECONDS=60
 JOB_HOUR=8
+JOB_MINUTE=0
 ```
 
-One run captures a single host-local calendar date and passes it through reminder and report processing so a long run cannot split across two report dates. The host timezone is not yet an approved per-course timezone policy; settle that before worldwide scheduled use.
+Configuration rejects invalid scheduler times, invalid SMTP ports, and a non-finite or non-positive send delay. A zero delay would bypass the required pause between sends. One run captures a single host-local calendar date and passes it through reminder and report processing so a long run cannot split across two report dates. The host timezone is not yet an approved per-course timezone policy; settle that before worldwide scheduled use.
 
 ---
 

@@ -148,3 +148,17 @@ When a new decision is made during this project, add it to this file in the same
 **Decided:** Keep the local `qrcode.react` Canvas output and make the downloadable QR a PNG. This supersedes the earlier SVG-output note in the 2026-10-07 QR milestone.
 **Why:** The operator chose PNG for easier sharing across social applications.
 **What was rejected:** An SVG-only download that may be less convenient for the intended social sharing workflow.
+
+### 2026-10-10, Close direct Data API access and fail closed on unsafe settings
+**Found:** The Phase 1 table definitions did not enable row-level security or explicitly revoke direct `PUBLIC`, `anon`, and `authenticated` access. Supabase documents that exposed `public` tables can be reachable through the Data API when grants and RLS permit it; actual access depends on the live project's grants and was not inspected.
+**Decided:** Update the local schema source to enable RLS on all Phase 1 tables, revoke direct client-role access, and grant the server-only `service_role` only the `SELECT`, `INSERT`, and `UPDATE` permissions the backend uses. Also require valid scheduler times, a valid SMTP port, and a finite, strictly positive reminder delay; set `SMTP_PORT=587` in `.env.example` so copying it does not make configuration parsing fail.
+**Why:** The web client has no direct database role, and a zero or invalid delay must not silently disable the required pause between sends. Invalid configuration should fail before the service starts.
+**What was rejected:** Depending on project-wide default grants, allowing the browser to access learner tables, or allowing zero/negative/infinite delays.
+**Boundary:** These changes affect repository files only. They do not inspect or modify the live Supabase project, run a migration, authorize real learner data, or deploy the backend. Before real data is used, inspect the actual project grants and apply a separately authorized migration. Reference: [Supabase table security](https://supabase.com/docs/guides/database/tables).
+
+### 2026-10-10, Make sample seeding repeatable and deliberate
+**Found:** Each run generated new random IDs for the same synthetic students, courses, and enrollments, and the script wrote to whichever Supabase project the current environment selected.
+**Decided:** Give sample records stable IDs so reruns upsert the same synthetic rows, and require the operator to pass `--confirm-test-database` before the script creates a database client or writes anything.
+**Why:** This prevents repeated sample seeding from multiplying reminder targets and adds a deliberate check before any configured database is modified.
+**What was rejected:** Automatically guessing whether a Supabase project is production, deleting prior seed rows, or allowing a no-flag database write.
+**Boundary:** This does not prove the selected project is a test project and does not authorize running the seed script. The operator must verify the target project before using the flag; no database was written during this audit.
