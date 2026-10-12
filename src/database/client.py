@@ -25,6 +25,10 @@ class SupabaseClient:
     def table(self, name: str) -> Any:
         return self._client.table(name)
 
+    def auth_get_user(self, access_token: str) -> Any:
+        """Validate an access token against Supabase Auth and return its user."""
+        return self._client.auth.get_user(access_token)
+
 
 @lru_cache
 def get_db() -> SupabaseClient:

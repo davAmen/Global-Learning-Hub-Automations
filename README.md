@@ -17,7 +17,7 @@ The current code is the reminder service, not a deployed course marketplace.
    (currently `whatsapp`).
 3. It logs every send to `reminder_log` and to a log file.
 4. It marks students as `active` / `low_engagement` / `needs_followup`.
-5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled runs.
+5. It builds a daily engagement report and sends it to the configured Telegram administrator chat during scheduled and manual runs. The report distinguishes provider-accepted, failed, and pending/unknown attempts; provider acceptance is not proof that the recipient received the message.
 
 ## Stack
 
@@ -33,12 +33,12 @@ python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env   # keep provider tokens blank during local testing
-python scripts\seed_sample_data.py   # inserts FAKE students/courses into the configured database
+python scripts\seed_sample_data.py --confirm-test-database  # repeatable fake records; only for a non-production test database
 python scripts\run_daily_job.py      # can send messages if real provider credentials are configured
 uvicorn src.main:app --reload        # start the API
 ```
 
-> **Use synthetic student data only until a controlled pilot is explicitly authorized.** Keep WhatsApp and Telegram credentials blank during local testing. The sample numbers are fictional placeholders, not authorized recipients. The seed script requires a configured database; use a non-production test database, never a live student database.
+> **Use synthetic student data only until a controlled pilot is explicitly authorized.** Keep WhatsApp and Telegram credentials blank during local testing. The sample numbers are fictional placeholders, not authorized recipients. The seed script requires a configured database and the explicit `--confirm-test-database` flag; use a non-production test database, never a live student database. The flag is a deliberate operator check, not automatic proof that the configured Supabase project is non-production.
 
 Set a long random `ADMIN_API_KEY` in `.env` and send it in the `X-Admin-Key`
 header for `/run-daily-job` and `/reports/today`. Never expose that key in a
@@ -53,5 +53,10 @@ provider payload verification and provider-message-ID mapping are built.
 | `/run-daily-job` | POST | Manually triggers the full daily flow |
 | `/webhooks/{channel}` | POST | Receives delivery-status callbacks |
 | `/reports/today` | GET | Today's engagement report as JSON |
+| `/readiness/consent-notice?channel=...` | GET | Sample copy for the separate Phase 2 weekly device-readiness notice |
+| `/readiness/enrollments/{enrollment_id}/payment-events` | POST | Staff-authenticated payment verification/revocation record |
+| `/readiness/me/consent-events` | POST | Learner-authenticated consent for their linked account |
+| `/readiness/students/{student_id}/consent-events` | POST | Staff entry of a learner's direct consent request |
+| `/readiness/me/channel-preferences` | POST | Learner-authenticated preferred/fallback channel order |
 
 See `docs/ARCHITECTURE.md` for the full specification.

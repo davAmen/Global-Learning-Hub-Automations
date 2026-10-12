@@ -4,12 +4,14 @@ Sets up routes and APScheduler for the daily job.
 """
 
 from contextlib import asynccontextmanager
+from datetime import date
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
 
 from src.api.routes_health import router as health_router
 from src.api.routes_jobs import router as jobs_router
+from src.api.routes_readiness import router as readiness_router
 from src.api.routes_reports import router as reports_router
 from src.api.routes_webhooks import router as webhooks_router
 from src.config import get_settings
@@ -27,8 +29,9 @@ def run_scheduled_job():
 
     logger.info("Scheduled job firing.")
     db = get_db()
-    send_reminders(db)
-    send_report_to_admin(build_report(db))
+    run_date = date.today()
+    send_reminders(db, run_date)
+    send_report_to_admin(build_report(db, run_date), db=db)
 
 
 @asynccontextmanager
@@ -46,5 +49,6 @@ app = FastAPI(title="Global Learning Hub Automation", lifespan=lifespan)
 
 app.include_router(health_router)
 app.include_router(jobs_router)
+app.include_router(readiness_router)
 app.include_router(reports_router)
 app.include_router(webhooks_router)

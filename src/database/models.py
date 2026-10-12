@@ -41,8 +41,9 @@ class Enrollment(BaseModel):
 
 class ReminderLog(BaseModel):
     id: UUID
-    enrollment_id: UUID
+    enrollment_id: Optional[UUID] = None
     channel: str
     message: str
     sent_at: datetime
     delivery_status: Literal["sent", "failed", "pending"] = "pending"
+    idempotency_key: Optional[str] = None

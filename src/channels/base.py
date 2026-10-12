@@ -20,8 +20,8 @@ class Channel(abc.ABC):
     name: str = "base"
 
     @abc.abstractmethod
-    def send(self, student, message: str) -> bool:
-        """Send a message. Return True on success, False on failure."""
+    def send(self, student, message: str) -> bool | None:
+        """Return True if accepted, False if rejected, or None if outcome is unknown."""
         raise NotImplementedError
 
 
@@ -49,10 +49,11 @@ def send_and_log(
     student: Any,
     message: str,
     enrollment_id: UUID | str | None,
+    *,
+    idempotency_key: str,
 ) -> bool:
-    """Log a pending student-message attempt before contacting its channel."""
+    """Claim and log one idempotent send attempt before contacting its channel."""
     attempt_id = str(uuid4())
-    recipient = getattr(student, "name", "student")
 
     try:
         db.table("reminder_log").insert(
@@ -61,32 +62,45 @@ def send_and_log(
                 "enrollment_id": str(enrollment_id) if enrollment_id is not None else None,
                 "channel": channel.name,
                 "message": message,
+                "idempotency_key": idempotency_key,
                 "sent_at": datetime.now(timezone.utc).isoformat(),
                 "delivery_status": "pending",
             }
         ).execute()
-    except Exception:
-        logger.exception("Could not record the send attempt; message was not sent.")
+    except Exception as exc:
+        logger.error(
+            "Could not claim/log send attempt %s (%s); message was not sent.",
+            attempt_id,
+            type(exc).__name__,
+        )
         return False
 
-    logger.info(f"Attempting {channel.name} message to {recipient}.")
+    logger.info("Attempting %s message (attempt %s).", channel.name, attempt_id)
     try:
-        sent = channel.send(student, message)
-    except Exception:
-        logger.exception(f"{channel.name} send raised an error for {recipient}.")
-        sent = False
+        outcome = channel.send(student, message)
+    except Exception as exc:
+        logger.error("%s send raised %s (attempt %s).", channel.name, type(exc).__name__, attempt_id)
+        outcome = None
+
+    delivery_status = (
+        "sent" if outcome is True else "failed" if outcome is False else "pending"
+    )
 
     try:
         db.table("reminder_log").update(
-            {"delivery_status": "sent" if sent else "failed"}
+            {"delivery_status": delivery_status}
         ).eq("id", attempt_id).execute()
-    except Exception:
-        logger.exception(
-            f"Could not update the send status for attempt {attempt_id}; it remains pending."
+    except Exception as exc:
+        logger.error(
+            "Could not update send status for attempt %s (%s); it remains pending.",
+            attempt_id,
+            type(exc).__name__,
         )
 
-    if sent:
-        logger.info(f"Message sent to {recipient} via {channel.name}.")
+    if outcome is True:
+        logger.info("Provider accepted %s attempt %s.", channel.name, attempt_id)
+    elif outcome is False:
+        logger.error("%s attempt %s failed.", channel.name, attempt_id)
     else:
-        logger.error(f"Message failed for {recipient} via {channel.name}.")
-    return sent
+        logger.warning("%s attempt %s has an unknown outcome; do not retry automatically.", channel.name, attempt_id)
+    return outcome is True

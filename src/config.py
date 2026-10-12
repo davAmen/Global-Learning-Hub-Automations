@@ -7,6 +7,7 @@ Nothing is hardcoded - no API key or credential ever appears in source code.
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import Field, FiniteFloat
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,18 +18,21 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     admin_api_key: str = ""
 
-    active_channel: Literal["whatsapp", "telegram"] = "whatsapp"
-    backup_channel: Literal["whatsapp", "telegram"] = "telegram"
+    active_channel: Literal["whatsapp"] = "whatsapp"
+    backup_channel: Literal["telegram"] = "telegram"
 
     whatsapp_token: str = ""
     whatsapp_phone_id: str = ""
+    whatsapp_api_version: str = ""
+    whatsapp_template_name: str = ""
+    whatsapp_template_language: str = "en_US"
 
     telegram_bot_token: str = ""
     telegram_admin_chat_id: str = ""
 
     email_api_key: str = ""
     smtp_host: str = ""
-    smtp_port: int = 587
+    smtp_port: int = Field(default=587, ge=1, le=65535)
     smtp_username: str = ""
     smtp_password: str = ""
 
@@ -37,9 +41,9 @@ class Settings(BaseSettings):
     admin_email: str = ""
     admin_phone: str = ""
 
-    job_hour: int = 8
-    job_minute: int = 0
-    rate_limit_delay_seconds: float = 60.0
+    job_hour: int = Field(default=8, ge=0, le=23)
+    job_minute: int = Field(default=0, ge=0, le=59)
+    rate_limit_delay_seconds: FiniteFloat = Field(default=60.0, gt=0)
 
 
 @lru_cache

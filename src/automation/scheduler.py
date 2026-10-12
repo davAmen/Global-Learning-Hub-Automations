@@ -93,9 +93,10 @@ def _send_reminders(db, on_date: date | None = None) -> int:
     from src.automation.reminder_templates import reminder_for
     from src.automation.engagement import update_engagement
 
+    run_date = on_date or date.today()
     settings = get_settings()
     channel = get_channel(settings.active_channel)
-    queue = build_reminder_queue(db, on_date)
+    queue = build_reminder_queue(db, run_date)
     sent = 0
     has_attempted_send = False
 
@@ -105,7 +106,7 @@ def _send_reminders(db, on_date: date | None = None) -> int:
             logger.warning(f"No student found for enrollment {enrollment.id}")
             continue
 
-        status = update_engagement(db, enrollment.id, on_date)
+        status = update_engagement(db, enrollment.id, run_date)
 
         resp = db.table("courses").select("name, class_time").eq("id", str(enrollment.course_id)).limit(1).execute()
         course_name = resp.data[0]["name"] if resp.data else "your course"
@@ -114,7 +115,14 @@ def _send_reminders(db, on_date: date | None = None) -> int:
         tmpl = reminder_for(student.name, course_name, class_time, status)
         if has_attempted_send and settings.rate_limit_delay_seconds > 0:
             time.sleep(settings.rate_limit_delay_seconds)
-        ok = send_and_log(db, channel, student, tmpl.body, enrollment.id)
+        ok = send_and_log(
+            db,
+            channel,
+            student,
+            tmpl.body,
+            enrollment.id,
+            idempotency_key=f"student-reminder:{enrollment.id}:{run_date.isoformat()}",
+        )
         has_attempted_send = True
 
         if ok:
